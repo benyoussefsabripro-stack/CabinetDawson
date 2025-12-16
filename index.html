@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intranet Cabinet Avocat</title>
+
+    <style>
+        
+        :root {
+    --gold: #c5a059;       /* Couleur Or du cabinet */
+    --gold-dark: #b08d4b;
+    --bg-dark: #1e1e1e;    /* Fond sombre */
+    --panel: #2b2b2b;      /* Fond des panneaux */
+    --text: #e0e0e0;       /* Couleur texte */
+    --input-bg: #3a3a3a;
+    --green: #85bb65;      /* Couleur argent */
+    --red: #d9534f;
+}
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text);
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    background-color: var(--panel);
+    padding: 30px;
+    border-radius: 8px;
+    border-top: 4px solid var(--gold);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+h1 {
+    color: var(--gold);
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 30px;
+    border-bottom: 1px solid #444;
+    padding-bottom: 20px;
+}
+
+/* --- Formulaire --- */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr; /* 4 colonnes */
+    gap: 15px;
+    background: #222;
+    padding: 20px;
+    border-radius: 6px;
+    margin-bottom: 25px;
+}
+
+.full-width { grid-column: span 4; }
+.half-width { grid-column: span 2; }
+
+.form-group { display: flex; flex-direction: column; }
+
+label {
+    font-size: 0.8rem;
+    color: #888;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+input, select {
+    background: var(--input-bg);
+    border: 1px solid #444;
+    color: white;
+    padding: 10px;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: var(--gold);
+}
+
+/* Checkboxes stylisées */
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    background: var(--input-bg);
+    padding: 10px;
+    border: 1px solid #444;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.checkbox-container input { margin-right: 10px; cursor: pointer; }
+.checkbox-container label { margin: 0; cursor: pointer; color: #fff; }
+
+/* Bouton */
+button.btn-save {
+    background-color: var(--gold);
+    color: #111;
+    font-weight: bold;
+    border: none;
+    padding: 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-size: 1rem;
+    transition: 0.2s;
+    grid-column: span 4;
+    margin-top: 10px;
+}
+button.btn-save:hover { background-color: var(--gold-dark); }
+
+/* --- Tableau --- */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+}
+
+th {
+    text-align: left;
+    color: var(--gold);
+    padding: 15px 10px;
+    border-bottom: 2px solid #444;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+
+td {
+    padding: 15px 10px;
+    border-bottom: 1px solid #333;
+    vertical-align: middle;
+}
+
+tr:hover { background-color: #333; }
+
+.badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+.badge-yes { background: rgba(133, 187, 101, 0.2); color: var(--green); }
+.badge-no { background: rgba(217, 83, 79, 0.2); color: var(--red); }
+
+.money { font-family: 'Consolas', monospace; color: #bbb; }
+.money.gain { color: var(--green); font-weight: bold; }
+
+/* --- Totaux (Footer) --- */
+.footer-totals {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+    background: #222;
+    padding: 20px;
+    border-radius: 6px;
+}
+
+.total-card { text-align: center; width: 30%; }
+.total-card span { display: block; font-size: 0.8rem; color: #888; text-transform: uppercase; }
+.total-card div { font-size: 1.5rem; color: var(--gold); margin-top: 5px; }
+
+.delete-btn {
+    background: none; border: none; cursor: pointer; font-size: 1.2rem;
+    opacity: 0.5; transition: 0.2s;
+}
+.delete-btn:hover { opacity: 1; transform: scale(1.1); }
+
+    </style>
+</head>
+<div class="container">
+    <h1>⚖️ Gestion Commis d'Office</h1>
+
+    <div class="form-grid">
+        <div class="form-group half-width">
+            <label>Nom du Client</label>
+            <input type="text" id="client" placeholder="Ex: Jean Dupont">
+        </div>
+        <div class="form-group half-width">
+            <label>Charges / Chefs d'accusation</label>
+            <input type="text" id="charges" placeholder="Ex: Vol de véhicule, Outrage...">
+        </div>
+
+        <div class="form-group">
+            <label>Votre Grade</label>
+            <select id="grade">
+                <option value="0.25">Stagiaire (25%)</option>
+                <option value="0.35" selected>Avocat (35%)</option>
+                <option value="0.50">Associé (50%)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Amende Client ($)</label>
+            <input type="number" id="amende" placeholder="0">
+        </div>
+        <div class="form-group checkbox-container">
+            <input type="checkbox" id="proces">
+            <label for="proces">Procès effectué ?</label>
+        </div>
+        <div class="form-group checkbox-container">
+            <input type="checkbox" id="accord">
+            <label for="accord">Accord trouvé ?</label>
+        </div>
+
+        <button class="btn-save" onclick="ajouterDossier()">Enregistrer le Dossier (+150 000$)</button>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th width="15%">Client</th>
+                <th width="25%">Charges</th>
+                <th width="10%">Amende</th>
+                <th width="8%">Procès</th>
+                <th width="8%">Accord</th>
+                <th width="12%">Facture État</th>
+                <th width="12%">Votre Part</th>
+                <th width="5%"></th>
+            </tr>
+        </thead>
+        <tbody id="listeDossiers">
+            </tbody>
+    </table>
+
+    <div class="footer-totals">
+        <div class="total-card">
+            <span>Total Facturé (État)</span>
+            <div id="totalEtat" class="money">0 $</div>
+        </div>
+        <div class="total-card">
+            <span>Votre Gain Total</span>
+            <div id="totalGain" class="money gain">0 $</div>
+        </div>
+        <div class="total-card">
+            <span>Total Amendes</span>
+            <div id="totalAmendes" style="color:#fff;">0 $</div>
+        </div>
+    </div>
+</div>
+<body>
+
+    <script>
+
+       // --- CONFIGURATION ---
+const PRIX_COMMIS = 150000;
+let historique = JSON.parse(localStorage.getItem('avocat_db_v3')) || [];
+
+// --- FONCTIONS ---
+
+function ajouterDossier() {
+    // 1. Récupérer les valeurs
+    const client = document.getElementById('client').value;
+    const charges = document.getElementById('charges').value;
+    const gradePourcentage = parseFloat(document.getElementById('grade').value);
+    const amende = parseFloat(document.getElementById('amende').value) || 0;
+    const proces = document.getElementById('proces').checked;
+    const accord = document.getElementById('accord').checked;
+
+    if (client.trim() === "") {
+        alert("Il faut au moins le nom du client !");
+        return;
+    }
+
+    // 2. Calculs
+    const maPart = PRIX_COMMIS * gradePourcentage;
+
+    // 3. Créer l'objet
+    const dossier = {
+        id: Date.now(),
+        client: client,
+        charges: charges || "Non spécifié",
+        amende: amende,
+        proces: proces,
+        accord: accord,
+        factureEtat: PRIX_COMMIS,
+        gainAvocat: maPart
+    };
+
+    // 4. Sauvegarder
+    historique.push(dossier);
+    sauvegarderEtAfficher();
+    resetFormulaire();
+}
+
+function supprimerDossier(id) {
+    if(confirm("Supprimer ce dossier ?")) {
+        historique = historique.filter(d => d.id !== id);
+        sauvegarderEtAfficher();
+    }
+}
+
+function sauvegarderEtAfficher() {
+    // Sauvegarde locale
+    localStorage.setItem('avocat_db_v3', JSON.stringify(historique));
+    
+    // Affichage Tableau
+    const tbody = document.getElementById('listeDossiers');
+    tbody.innerHTML = '';
+    
+    let sumEtat = 0;
+    let sumGain = 0;
+    let sumAmendes = 0;
+
+    // On inverse pour avoir le dernier en haut
+    const listeInverse = [...historique].reverse();
+
+    listeInverse.forEach(d => {
+        sumEtat += d.factureEtat;
+        sumGain += d.gainAvocat;
+        sumAmendes += d.amende;
+
+        const htmlRow = `
+            <tr>
+                <td style="font-weight:bold; color:#fff;">${d.client}</td>
+                <td style="font-style:italic; color:#aaa;">${d.charges}</td>
+                <td class="money">${formaterArgent(d.amende)}</td>
+                <td>${d.proces ? '<span class="badge badge-yes">OUI</span>' : '<span class="badge badge-no">NON</span>'}</td>
+                <td>${d.accord ? '<span class="badge badge-yes">OUI</span>' : '<span class="badge badge-no">NON</span>'}</td>
+                <td class="money">${formaterArgent(d.factureEtat)}</td>
+                <td class="money gain">+ ${formaterArgent(d.gainAvocat)}</td>
+                <td><button class="delete-btn" onclick="supprimerDossier(${d.id})">🗑️</button></td>
+            </tr>
+        `;
+        tbody.innerHTML += htmlRow;
+    });
+
+    // Mise à jour des totaux
+    document.getElementById('totalEtat').innerText = formaterArgent(sumEtat);
+    document.getElementById('totalGain').innerText = formaterArgent(sumGain);
+    document.getElementById('totalAmendes').innerText = formaterArgent(sumAmendes);
+}
+
+function resetFormulaire() {
+    document.getElementById('client').value = '';
+    document.getElementById('charges').value = '';
+    document.getElementById('amende').value = '';
+    document.getElementById('proces').checked = false;
+    document.getElementById('accord').checked = false;
+}
+
+function formaterArgent(montant) {
+    return new Intl.NumberFormat('en-US').format(montant).replace(/,/g, ' ') + ' $';
+}
+
+// Lancer au démarrage
+sauvegarderEtAfficher();
+
+    </script>
+
+</body>
+</html>
