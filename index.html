@@ -69,17 +69,20 @@ td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
 
 <div id="app-screen" class="hidden">
     <nav class="navbar glass-panel">
-        <div><h1 style="color:#d4af37; font-size:1.2rem;">DAWSON & PARTNERS</h1><span id="roleBadge" style="font-size:0.8rem; color:#fff;">...</span></div>
-        <button id="btnLogout" style="background:none; border:1px solid #444; color:#fff; padding:8px 12px; border-radius:4px; cursor:pointer;">Déconnexion</button>
+        <div>
+            <h1 style="color:#d4af37; font-size:1.2rem;">DAWSON & PARTNERS</h1>
+            <span id="roleBadge" style="font-size:0.8rem; color:#fff;">...</span>
+        </div>
+        <button id="btnLogout" style="background:none; border:1px solid #ff4d4d; color:#ff4d4d; padding:8px 12px; border-radius:4px; cursor:pointer; font-weight:bold;">Déconnexion</button>
     </nav>
 
     <div id="adminPanel" class="admin-section glass-panel hidden">
         <h3 style="color:#d4af37;">👑 Gestion RH</h3>
         
         <div class="form-grid" style="margin-top:15px; margin-bottom:20px;">
-            <div class="input-group"><label>Nouveau Nom</label><input type="text" id="newUserName"></div>
-            <div class="input-group"><label>Mot de passe</label><input type="text" id="newUserPass"></div>
-            <div class="input-group"><label>Grade Initial</label>
+            <div class="input-group"><label>Nouveau Nom *</label><input type="text" id="newUserName" placeholder="Requis"></div>
+            <div class="input-group"><label>Mot de passe *</label><input type="text" id="newUserPass" placeholder="Requis"></div>
+            <div class="input-group"><label>Grade</label>
                 <select id="newUserGrade">
                     <option value="0.75">Président (75%)</option>
                     <option value="0.65">Partenaire Directeur (65%)</option>
@@ -90,7 +93,6 @@ td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
                     <option value="0.35" selected>Avocat (35%)</option>
                     <option value="0.30">Avocat Junior (30%)</option>
                     <option value="0">Parajuriste (0%)</option>
-                    <option value="0">Assistant Juridique (0%)</option>
                 </select>
             </div>
             <button class="btn-primary" id="btnCreateUser">Créer</button>
@@ -98,9 +100,9 @@ td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         
         <hr style="border:0; border-top:1px solid #d4af37; opacity:0.3; margin:20px 0;">
 
-        <h3 style="color:#d4af37; font-size:1rem;">✏️ Modifier le Grade d'un employé</h3>
+        <h3 style="color:#d4af37; font-size:1rem;">✏️ Modifier Grade</h3>
         <div class="form-grid" style="margin-top:15px;">
-            <div class="input-group" style="grid-column: span 2;"><label>Choisir l'Employé</label><select id="editUserSelect"><option>Chargement...</option></select></div>
+            <div class="input-group" style="grid-column: span 2;"><label>Employé</label><select id="editUserSelect"><option>Chargement...</option></select></div>
             <div class="input-group"><label>Nouveau Grade</label>
                 <select id="editUserGrade">
                     <option value="0.75">Président (75%)</option>
@@ -112,7 +114,6 @@ td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
                     <option value="0.35">Avocat (35%)</option>
                     <option value="0.30">Avocat Junior (30%)</option>
                     <option value="0">Parajuriste (0%)</option>
-                    <option value="0">Assistant Juridique (0%)</option>
                 </select>
             </div>
             <button class="btn-primary" id="btnEditUser">Mettre à jour</button>
@@ -131,12 +132,10 @@ td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
             <div class="input-group"><label>Client</label><input type="text" id="client"></div>
             <div class="input-group"><label>Charges</label><input type="text" id="charges"></div>
             <div class="input-group"><label>Amende</label><input type="number" id="amende"></div>
-            
             <div class="toggles-wrapper">
                 <label class="toggle-control"><input type="checkbox" id="proces"><span class="control"></span><span class="label">Procès</span></label>
                 <label class="toggle-control"><input type="checkbox" id="accord"><span class="control"></span><span class="label">Accord</span></label>
             </div>
-            
             <button class="btn-primary" id="btnAddCase" style="grid-column:1/-1">Enregistrer</button>
         </div>
     </div>
@@ -161,7 +160,7 @@ td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
 
     <script type="module">
 
-       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, addDoc, onSnapshot, query, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -181,14 +180,13 @@ let currentUser = null;
 let globalUsers = [];
 let globalDossiers = [];
 
-// ECOUTE UTILISATEURS
+// DATA LISTENERS
 onSnapshot(collection(db, "users"), (s) => {
     globalUsers = [];
     s.forEach(d => globalUsers.push({id: d.id, ...d.data()}));
-    chargerSelectEdit(); // Met à jour la liste déroulante admin
+    chargerSelectEdit();
 });
 
-// ECOUTE DOSSIERS
 onSnapshot(query(collection(db, "dossiers")), (s) => {
     globalDossiers = [];
     s.forEach(d => globalDossiers.push({id: d.id, ...d.data()}));
@@ -205,8 +203,6 @@ document.getElementById('btnLogin').addEventListener('click', () => {
         document.getElementById('login-screen').classList.add('hidden');
         document.getElementById('app-screen').classList.remove('hidden');
         document.getElementById('roleBadge').innerText = currentUser.role.toUpperCase();
-        
-        // Afficher admin si Dawson ou Mariani
         if(currentUser.name.toLowerCase().includes('dawson') || currentUser.name.toLowerCase().includes('mariani')) {
             document.getElementById('adminPanel').classList.remove('hidden');
         }
@@ -215,6 +211,59 @@ document.getElementById('btnLogin').addEventListener('click', () => {
         document.getElementById('loginError').classList.remove('hidden');
     }
 });
+
+// DECONNEXION (FIXED)
+document.getElementById('btnLogout').addEventListener('click', () => {
+    currentUser = null;
+    window.location.reload(); // Recharge la page pour déconnecter
+});
+
+// CREATION USER (FIXED: Validation)
+document.getElementById('btnCreateUser').addEventListener('click', async () => {
+    const name = document.getElementById('newUserName').value.trim();
+    const pass = document.getElementById('newUserPass').value.trim();
+    
+    // VERIFICATION : SI VIDE, ON STOPPE TOUT
+    if(!name || !pass) {
+        alert("❌ ERREUR : Le Nom et le Mot de passe sont obligatoires !");
+        return; // On arrête la fonction ici
+    }
+
+    const sel = document.getElementById('newUserGrade');
+    await addDoc(collection(db, "users"), {
+        name: name,
+        pass: pass,
+        grade: parseFloat(sel.value),
+        role: sel.options[sel.selectedIndex].text.split('(')[0].trim()
+    });
+    alert("✅ Utilisateur créé avec succès !");
+    document.getElementById('newUserName').value = "";
+    document.getElementById('newUserPass').value = "";
+});
+
+// MODIFIER USER
+document.getElementById('btnEditUser').addEventListener('click', async () => {
+    const id = document.getElementById('editUserSelect').value;
+    const sel = document.getElementById('editUserGrade');
+    if(!id || id==="Choisir...") return;
+    
+    await updateDoc(doc(db, "users", id), {
+        grade: parseFloat(sel.value),
+        role: sel.options[sel.selectedIndex].text.split('(')[0].trim()
+    });
+    alert("✅ Grade mis à jour !");
+});
+
+// CHARGER LISTE ADMIN
+function chargerSelectEdit() {
+    const s = document.getElementById('editUserSelect');
+    s.innerHTML = "<option>Choisir...</option>";
+    globalUsers.sort((a,b) => a.name.localeCompare(b.name)).forEach(u => {
+        const opt = document.createElement('option');
+        opt.value = u.id; opt.innerText = `${u.name} (${u.role})`;
+        s.appendChild(opt);
+    });
+}
 
 // AJOUT DOSSIER
 document.getElementById('btnAddCase').addEventListener('click', async () => {
@@ -237,7 +286,7 @@ document.getElementById('btnAddCase').addEventListener('click', async () => {
     document.getElementById('amende').value = "";
 });
 
-// AFFICHAGE TABLEAU (Avec Filtre Recherche)
+// RENDU TABLEAU
 window.renderTable = () => {
     const tbody = document.getElementById('listeDossiers');
     const search = document.getElementById('search').value.toLowerCase();
@@ -245,7 +294,7 @@ window.renderTable = () => {
     let tE=0, tG=0, tA=0;
     
     let list = globalDossiers.sort((a,b) => b.timestamp - a.timestamp);
-    if(search) list = list.filter(d => d.client.toLowerCase().includes(search)); // Filtre
+    if(search) list = list.filter(d => d.client.toLowerCase().includes(search));
 
     list.forEach(d => {
         tE += d.factureEtat; tA += d.amende;
@@ -271,45 +320,7 @@ window.renderTable = () => {
     document.getElementById('totalAmendes').innerText = tA + " $";
 };
 
-// --- FONCTIONS ADMIN ---
-
-// Charger la liste des employés dans le menu déroulant
-function chargerSelectEdit() {
-    const s = document.getElementById('editUserSelect');
-    s.innerHTML = "<option>Choisir...</option>";
-    globalUsers.sort((a,b) => a.name.localeCompare(b.name)).forEach(u => {
-        const opt = document.createElement('option');
-        opt.value = u.id; opt.innerText = `${u.name} (${u.role})`;
-        s.appendChild(opt);
-    });
-}
-
-// Créer Utilisateur
-document.getElementById('btnCreateUser').addEventListener('click', async () => {
-    const sel = document.getElementById('newUserGrade');
-    await addDoc(collection(db, "users"), {
-        name: document.getElementById('newUserName').value,
-        pass: document.getElementById('newUserPass').value,
-        grade: parseFloat(sel.value),
-        role: sel.options[sel.selectedIndex].text.split('(')[0].trim()
-    });
-    alert("Utilisateur créé !");
-});
-
-// Modifier Grade
-document.getElementById('btnEditUser').addEventListener('click', async () => {
-    const id = document.getElementById('editUserSelect').value;
-    const sel = document.getElementById('editUserGrade');
-    if(!id || id==="Choisir...") return;
-    
-    await updateDoc(doc(db, "users", id), {
-        grade: parseFloat(sel.value),
-        role: sel.options[sel.selectedIndex].text.split('(')[0].trim()
-    });
-    alert("Grade mis à jour !");
-});
-
-window.del = async (id) => { if(confirm("Supprimer ce dossier ?")) await deleteDoc(doc(db, "dossiers", id)); };
+window.del = async (id) => { if(confirm("Supprimer ?")) await deleteDoc(doc(db, "dossiers", id)); };
 
 window.exporterPDF = () => {
     const { jsPDF } = window.jspdf;
@@ -319,7 +330,6 @@ window.exporterPDF = () => {
     doc.autoTable({ startY: 30, head: [['Avocat', 'Client', 'Charges', 'Amende', 'Com']], body: data });
     doc.save("Rapport_Cabinet.pdf");
 };
-
 
     </script>
 
