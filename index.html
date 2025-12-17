@@ -345,17 +345,38 @@
         window.renderTable();
     }
 
-    document.getElementById('btnCreateUser').addEventListener('click', async () => {
-        const name = document.getElementById('newUserName').value;
-        const pass = document.getElementById('newUserPass').value;
-        const grade = parseFloat(document.getElementById('newUserGrade').value);
-        const sel = document.getElementById('newUserGrade');
-        const role = sel.options[sel.selectedIndex].text.split('(')[0].trim();
-        if(name && pass) {
-            await addDoc(collection(db, "users"), { name, pass, grade, role });
-            alert("Compte créé !");
+   // --- REMPLACEMENT DU BLOC CRÉATION UTILISATEUR ---
+document.getElementById('btnCreateUser').addEventListener('click', async () => {
+    const name = document.getElementById('newUserName').value;
+    const pass = document.getElementById('newUserPass').value;
+    const sel = document.getElementById('newUserGrade');
+    const grade = parseFloat(sel.value);
+    const role = sel.options[sel.selectedIndex].text.split('(')[0].trim();
+
+    if(name && pass) {
+        try {
+            console.log("Tentative de création de :", name); // Pour le débug
+            
+            await addDoc(collection(db, "users"), { 
+                name: name, 
+                pass: pass, 
+                grade: grade, 
+                role: role 
+            });
+            
+            alert(`✅ Succès ! L'avocat ${name} a été créé.`);
+            // On vide les champs
+            document.getElementById('newUserName').value = "";
+            document.getElementById('newUserPass').value = "";
+            
+        } catch (error) {
+            console.error("Erreur Firebase :", error);
+            alert("❌ ERREUR : " + error.message + "\n\n(Vérifie que tes règles Firestore sont en 'allow read, write: if true')");
         }
-    });
+    } else {
+        alert("⚠️ Il faut mettre un Nom et un Mot de passe !");
+    }
+});
 
     document.getElementById('btnEditUser').addEventListener('click', async () => {
         const userId = document.getElementById('editUserSelect').value;
