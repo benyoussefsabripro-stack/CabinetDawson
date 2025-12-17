@@ -3,625 +3,428 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Intranet Dawson & Partners</title>
-
+    <title>Intranet Dawson & Partners (Cloud)</title>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
     <style>
         
-       /* --- VARIABLES & RESET --- */
-:root {
-    --bg-dark: #0f0f13;
-    --panel-bg: rgba(30, 30, 35, 0.85);
-    --gold: #d4af37;
-    --gold-glow: rgba(212, 175, 55, 0.4);
-    --text-main: #ffffff;
-    --text-muted: #a0a0a0;
-    --danger: #ff4d4d;
-    --success: #00e676;
-    --font-main: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        /* RESET & FONTS */
+:root { 
+    --bg-dark: #0f0f13; 
+    --panel-bg: rgba(30, 30, 35, 0.95); 
+    --gold: #d4af37; 
+    --text-main: #fff; 
+    --font-main: 'Segoe UI', system-ui, sans-serif; 
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
+* { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
 
-body {
-    background-color: var(--bg-dark);
-    background-image: radial-gradient(circle at top right, #1a1a20 0%, #0f0f13 100%);
-    color: var(--text-main);
-    font-family: var(--font-main);
-    min-height: 100vh;
-    width: 100vw;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow-x: hidden;
+body { 
+    background: radial-gradient(circle at top right, #1a1a20 0%, #0f0f13 100%); 
+    color: var(--text-main); 
+    font-family: var(--font-main); 
+    min-height: 100vh; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    overflow-x: hidden; 
 }
 
 .hidden { display: none !important; }
 .fade-in { animation: fadeIn 0.5s ease forwards; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-/* GLASSMORPHISM */
-.glass-panel {
-    background: var(--panel-bg);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 16px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+/* PANNEAUX & STYLE */
+.glass-panel { 
+    background: var(--panel-bg); 
+    backdrop-filter: blur(12px); 
+    border: 1px solid rgba(255,255,255,0.08); 
+    border-radius: 16px; 
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4); 
 }
 
-/* --- LOGIN --- */
+/* LOGIN */
 #login-screen { width: 90%; max-width: 420px; padding: 40px; text-align: center; border-top: 4px solid var(--gold); }
-.logo-icon { font-size: 3rem; margin-bottom: 10px; text-shadow: 0 0 20px var(--gold-glow); }
-.error-msg { color: var(--danger); font-size: 0.9rem; margin: 10px 0; background: rgba(255, 77, 77, 0.1); padding: 5px; border-radius: 4px; }
-
-/* --- ADMIN PANEL --- */
-.admin-section {
-    padding: 25px; margin-bottom: 25px; 
-    border: 1px solid var(--gold); 
-    background: rgba(212, 175, 55, 0.05); 
-}
-
-/* --- APP LAYOUT --- */
-#app-screen { width: 100%; max-width: 1400px; padding: 20px; margin: 0 auto; }
-
-.navbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; margin-bottom: 25px; }
-.nav-brand { display: flex; align-items: center; gap: 15px; }
-.badge-role { background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; color: var(--gold); }
-.nav-user { display: flex; align-items: center; gap: 15px; }
-.user-name { font-weight: bold; color: #fff; }
-
-.btn-logout { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 10px; border-radius: 8px; cursor: pointer; }
-.btn-logout:hover { color: var(--danger); border-color: var(--danger); }
-
-/* STATS & FORM */
-.stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
-.stat-card { padding: 20px; text-align: center; border-bottom: 3px solid transparent; }
-.stat-card.highlight-gold { border-bottom-color: var(--gold); }
-.stat-card h3 { font-size: 1.6rem; margin-top: 5px; color: #fff; }
-.money.gain { color: var(--success); }
-
-.form-section { padding: 25px; margin-bottom: 25px; }
-.section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
-.tag-price { background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-family: monospace; color: var(--gold); }
 
 /* INPUTS */
 .input-group { margin-bottom: 15px; text-align: left; }
-label { display: block; color: var(--text-muted); font-size: 0.75rem; margin-bottom: 6px; text-transform: uppercase; font-weight: 600; }
-input, select {
-    width: 100%; padding: 12px; background: rgba(0, 0, 0, 0.3); 
-    border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: #fff; font-size: 1rem;
+label { display: block; color: #a0a0a0; font-size: 0.75rem; margin-bottom: 6px; text-transform: uppercase; font-weight: 600; }
+input, select { 
+    width: 100%; padding: 12px; 
+    background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); 
+    border-radius: 8px; color: #fff; font-size: 1rem; 
 }
-input:focus, select:focus { border-color: var(--gold); box-shadow: 0 0 10px var(--gold-glow); }
-.form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 15px; align-items: end; }
-.span-2 { grid-column: span 2; }
-.span-full { grid-column: 1 / -1; margin-top: 10px; }
 
 /* BOUTONS */
-.btn-primary {
-    width: 100%; padding: 14px; background: linear-gradient(135deg, var(--gold), #b38f26);
-    color: #000; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; text-transform: uppercase;
+.btn-primary { 
+    width: 100%; padding: 14px; 
+    background: linear-gradient(135deg, var(--gold), #b38f26); 
+    color: #000; font-weight: bold; border: none; 
+    border-radius: 8px; cursor: pointer; text-transform: uppercase; margin-top: 10px; 
 }
 .btn-primary:hover { transform: translateY(-2px); }
 
-/* NOUVEAU : BOUTON PDF */
-.btn-pdf {
-    background: #fff; color: #000; font-weight: bold; border: none; padding: 10px 15px; 
-    border-radius: 6px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 5px;
+.btn-pdf { 
+    background: #fff; color: #000; padding: 8px 15px; 
+    border-radius: 6px; cursor: pointer; font-weight: bold; border: none; 
 }
-.btn-pdf:hover { background: #eee; transform: translateY(-2px); }
 
-/* CHECKBOX */
-.toggles-wrapper { display: flex; gap: 20px; height: 48px; align-items: center; }
-.toggle-control { display: flex; align-items: center; cursor: pointer; }
-.toggle-control input { display: none; }
-.toggle-control .control { width: 40px; height: 22px; background: rgba(255,255,255,0.1); border-radius: 20px; position: relative; margin-right: 10px; transition: 0.3s; }
-.toggle-control .control::after { content:''; position: absolute; left: 2px; top: 2px; width: 18px; height: 18px; background: #fff; border-radius: 50%; transition: 0.3s; }
-.toggle-control input:checked + .control { background: var(--gold); }
-.toggle-control input:checked + .control::after { transform: translateX(18px); }
-.toggle-control .label { font-size: 0.9rem; color: #ccc; }
+/* LAYOUT APP */
+#app-screen { width: 100%; max-width: 1400px; padding: 20px; }
+.navbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; margin-bottom: 25px; }
 
-/* TABLEAU & ACTIONS */
-.table-section { padding: 0; overflow: hidden; }
-.table-header { padding: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-.actions-header { display: flex; gap: 10px; align-items: center; }
-.table-responsive { overflow-x: auto; width: 100%; }
+.admin-section { padding: 25px; margin-bottom: 25px; border: 1px solid var(--gold); background: rgba(212, 175, 55, 0.05); }
+
+/* STATS GRID */
+.stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
+.stat-card { padding: 20px; text-align: center; border-bottom: 3px solid transparent; }
+.stat-card.highlight-gold { border-bottom-color: var(--gold); }
+.money { font-family: monospace; font-size: 1.5rem; color: var(--gold); margin-top: 5px; }
+
+/* FORM GRID */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 15px; align-items: end; }
+
+/* TABLEAU */
+.table-responsive { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; min-width: 800px; }
-th { text-align: left; padding: 15px; color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.1); }
-td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; }
-.text-right { text-align: right; }
-.text-center { text-align: center; }
-.badge { padding: 4px 10px; border-radius: 50px; font-size: 0.7rem; font-weight: bold; }
-.badge.yes { background: rgba(0, 230, 118, 0.15); color: var(--success); }
-.badge.no { background: rgba(255, 77, 77, 0.15); color: var(--danger); }
-.delete-btn { background: none; border: none; color: #666; cursor: pointer; padding: 5px; font-size: 1.1rem; }
-.delete-btn:hover { color: var(--danger); }
+th { text-align: left; padding: 15px; color: #a0a0a0; font-size: 0.7rem; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.1); }
+td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
 
 /* MOBILE */
-@media (max-width: 900px) {
-    .form-grid { grid-template-columns: 1fr; }
-    .span-2 { grid-column: span 1; }
-    .navbar { flex-direction: column; gap: 15px; align-items: flex-start; }
-    .nav-brand, .nav-user { width: 100%; justify-content: space-between; }
-    #app-screen { padding: 10px; }
-    .table-header { flex-direction: column; align-items: stretch; }
-    .actions-header { justify-content: space-between; }
+@media (max-width: 900px) { 
+    .form-grid { grid-template-columns: 1fr; } 
+    .navbar { flex-direction: column; align-items: flex-start; gap: 10px; } 
 }
-        
-
 
     </style>
 </head>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
-<div class="bg-animation"></div>
-
 <div id="login-screen" class="glass-panel fade-in">
-    <div class="login-header">
-        <div class="logo-icon">⚖️</div>
-        <h2>Dawson & Partners</h2>
-        <p>Intranet Sécurisé</p>
-    </div>
+    <h2 style="color:#d4af37; margin-bottom:5px;">DAWSON & PARTNERS</h2>
+    <p style="color:#888; margin-bottom:30px;">Intranet Cloud</p>
     
     <div class="input-group">
-        <label>Identifiant (Nom Prénom)</label>
+        <label>Nom de famille</label>
         <input type="text" id="loginUser" placeholder="Ex: James Dawson">
     </div>
-    
     <div class="input-group">
         <label>Mot de passe</label>
         <input type="password" id="loginPass" placeholder="••••••">
     </div>
     
-    <p id="loginError" class="error-msg hidden">⛔ Identifiants incorrects</p>
-
-    <button class="btn-primary" onclick="tenterConnexion()">Accéder au Portail</button>
+    <button class="btn-primary" id="btnLogin">Connexion</button>
+    <p id="loginError" class="hidden" style="color:#ff4d4d; margin-top:10px;">⛔ Accès refusé</p>
 </div>
 
 <div id="app-screen" class="hidden">
-    
     <nav class="navbar glass-panel">
-        <div class="nav-brand">
-            <span class="logo">⚖️</span>
-            <div class="brand-text">
-                <h1>Dawson & Partners</h1>
-                <span id="roleBadge" class="badge-role">AVOCAT</span>
-            </div>
+        <div>
+            <h1 style="color:#d4af37; font-size:1.2rem; margin:0;">DAWSON & PARTNERS</h1>
+            <span id="roleBadge" style="font-size:0.8rem; color:#fff; font-weight:bold;">...</span>
         </div>
-        <div class="nav-user">
-            <div class="user-details">
-                <span class="welcome-label">Connecté en tant que</span>
-                <span id="displayUser" class="user-name">...</span>
-            </div>
-            <button class="btn-logout" onclick="deconnexion()">Déconnexion</button>
-        </div>
+        <button id="btnLogout" style="background:none; border:1px solid #444; color:#fff; padding:8px 12px; border-radius:4px; cursor:pointer;">Déconnexion</button>
     </nav>
 
-    <div class="main-content">
-        
-        <div id="adminPanel" class="admin-section glass-panel hidden">
+    <div id="adminPanel" class="admin-section glass-panel hidden">
+        <h3 style="color:#d4af37; margin-bottom:15px;">👑 Gestion RH (Admin)</h3>
+        <div class="form-grid">
+            <div class="input-group"><label>Nom Complet</label><input type="text" id="newUserName"></div>
+            <div class="input-group"><label>Mot de passe</label><input type="text" id="newUserPass"></div>
+            <div class="input-group"><label>Grade</label>
+                <select id="newUserGrade">
+                    <option value="0.75">Président (75%)</option>
+                    <option value="0.65">Partenaire Directeur (65%)</option>
+                    <option value="0.60">Partenaire Sénior (60%)</option>
+                    <option value="0.55">Partenaire (55%)</option>
+                    <option value="0.50">Partenaire Junior (50%)</option>
+                    <option value="0.40">Avocat Sénior (40%)</option>
+                    <option value="0.35" selected>Avocat (35%)</option>
+                    <option value="0.30">Avocat Junior (30%)</option>
+                    <option value="0">Parajuriste (0%)</option>
+                    <option value="0">Assistant Juridique (0%)</option>
+                </select>
+            </div>
+            <button class="btn-primary" id="btnCreateUser">Créer Compte</button>
+        </div>
+    </div>
+
+    <div class="stats-row">
+        <div class="stat-card glass-panel">
+            <span>Total Cabinet</span>
+            <h3 id="totalEtat" class="money">0 $</h3>
+        </div>
+        <div class="stat-card glass-panel highlight-gold">
+            <span>Vos Commissions</span>
+            <h3 id="totalGain" class="money" style="color:#00e676">0 $</h3>
+        </div>
+        <div class="stat-card glass-panel">
+            <span>Amendes</span>
+            <h3 id="totalAmendes" class="money">0 $</h3>
+        </div>
+    </div>
+
+    <div class="glass-panel" style="padding:25px; margin-bottom:25px;">
+        <h3 style="color:#d4af37; margin-bottom:20px;">Nouveau Dossier Commis (+150k)</h3>
+        <div class="form-grid">
+            <div class="input-group"><label>Client</label><input type="text" id="client"></div>
+            <div class="input-group"><label>Charges</label><input type="text" id="charges"></div>
+            <div class="input-group"><label>Amende ($)</label><input type="number" id="amende"></div>
             
-            <div class="section-header">
-                <h3>👑 Gestion RH - Création</h3>
+            <div style="display:flex; gap:15px; align-items:center;">
+                <label style="color:#fff; cursor:pointer;"><input type="checkbox" id="proces"> Procès</label>
+                <label style="color:#fff; cursor:pointer;"><input type="checkbox" id="accord"> Accord</label>
             </div>
-            <div class="form-grid">
-                <div class="input-group">
-                    <label>Nom</label>
-                    <input type="text" id="newUserName" placeholder="Prénom Nom">
-                </div>
-                <div class="input-group">
-                    <label>Mot de Passe</label>
-                    <input type="text" id="newUserPass" placeholder="Secret">
-                </div>
-                <div class="input-group">
-                    <label>Grade Initial</label>
-                    <select id="newUserGrade">
-                        <option value="0.75">Président (75%)</option>
-                        <option value="0.65">Partenaire Directeur (65%)</option>
-                        <option value="0.60">Partenaire Sénior (60%)</option>
-                        <option value="0.55">Partenaire (55%)</option>
-                        <option value="0.50">Partenaire Junior (50%)</option>
-                        <option value="0.40">Avocat Sénior (40%)</option>
-                        <option value="0.35" selected>Avocat (35%)</option>
-                        <option value="0.30">Avocat Junior (30%)</option>
-                        <option value="0">Parajuriste (0%)</option>
-                        <option value="0">Assistant Juridique (0%)</option>
-                    </select>
-                </div>
-                <button class="btn-primary" onclick="creerUtilisateur()">Créer</button>
-            </div>
-
-            <hr style="border: 0; border-top: 1px solid rgba(212, 175, 55, 0.3); margin: 20px 0;">
-
-            <div class="section-header">
-                <h3>✏️ Modifier Grade</h3>
-            </div>
-            <div class="form-grid">
-                <div class="input-group span-2">
-                    <label>Employé</label>
-                    <select id="editUserSelect"><option>Chargement...</option></select>
-                </div>
-                <div class="input-group">
-                    <label>Nouveau Grade</label>
-                    <select id="editUserGrade">
-                        <option value="0.75">Président (75%)</option>
-                        <option value="0.65">Partenaire Directeur (65%)</option>
-                        <option value="0.60">Partenaire Sénior (60%)</option>
-                        <option value="0.55">Partenaire (55%)</option>
-                        <option value="0.50">Partenaire Junior (50%)</option>
-                        <option value="0.40">Avocat Sénior (40%)</option>
-                        <option value="0.35" selected>Avocat (35%)</option>
-                        <option value="0.30">Avocat Junior (30%)</option>
-                        <option value="0">Parajuriste (0%)</option>
-                        <option value="0">Assistant Juridique (0%)</option>
-                    </select>
-                </div>
-                <button class="btn-primary" onclick="modifierGrade()">Mettre à jour</button>
-            </div>
+            
+            <button class="btn-primary" id="btnAddCase" style="grid-column:1/-1">Enregistrer le Dossier</button>
         </div>
+    </div>
 
-        <div class="stats-row">
-            <div class="stat-card glass-panel">
-                <span class="stat-label">Total Facturé (Cabinet)</span>
-                <h3 id="totalEtat" class="money">0 $</h3>
-            </div>
-            <div class="stat-card glass-panel highlight-gold">
-                <span class="stat-label" id="labelTotalGain">Vos Commissions</span>
-                <h3 id="totalGain" class="money gain">0 $</h3>
-            </div>
-            <div class="stat-card glass-panel">
-                <span class="stat-label">Amendes Clients</span>
-                <h3 id="totalAmendes" class="money">0 $</h3>
-            </div>
+    <div class="glass-panel" style="padding:0;">
+        <div style="padding:20px; display:flex; justify-content:space-between; align-items:center;">
+            <h3>Historique</h3>
+            <button class="btn-pdf" onclick="exporterPDF()">📄 Télécharger PDF</button>
         </div>
-
-        <div class="form-section glass-panel">
-            <div class="section-header">
-                <h3>Nouveau Dossier</h3>
-                <span class="tag-price">+ 150 000 $</span>
-            </div>
-
-            <div class="form-grid">
-                <div class="input-group">
-                    <label>Client</label>
-                    <input type="text" id="client" placeholder="Nom Prénom">
-                </div>
-                <div class="input-group span-2">
-                    <label>Charges</label>
-                    <input type="text" id="charges" placeholder="Délits...">
-                </div>
-                <div class="input-group">
-                    <label>Grade (Auto)</label>
-                    <input type="text" id="displayGrade" disabled style="opacity: 0.6;">
-                </div>
-                <div class="input-group">
-                    <label>Amende ($)</label>
-                    <input type="number" id="amende" placeholder="0">
-                </div>
-                <div class="toggles-wrapper">
-                    <label class="toggle-control">
-                        <input type="checkbox" id="proces">
-                        <span class="control"></span>
-                        <span class="label">Procès ?</span>
-                    </label>
-                    <label class="toggle-control">
-                        <input type="checkbox" id="accord">
-                        <span class="control"></span>
-                        <span class="label">Accord ?</span>
-                    </label>
-                </div>
-                <button class="btn-primary span-full" onclick="ajouterDossier()">Enregistrer le Dossier</button>
-            </div>
-        </div>
-
-        <div class="table-section glass-panel">
-            <div class="table-header">
-                <h3>Historique</h3>
-                <div class="actions-header">
-                    <button class="btn-pdf" onclick="exporterPDF()">📄 Exporter PDF</button>
-                    <div class="search-box">
-                        <input type="text" id="search" placeholder="Rechercher..." onkeyup="filtrerTableau()">
-                    </div>
-                </div>
-            </div>
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Avocat</th>
-                            <th>Client</th>
-                            <th>Charges</th>
-                            <th>Amende</th>
-                            <th class="text-center">Procès</th>
-                            <th class="text-center">Accord</th>
-                            <th class="text-right">Facture</th>
-                            <th class="text-right">Com</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody id="listeDossiers"></tbody>
-                </table>
-            </div>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Avocat</th>
+                        <th>Client</th>
+                        <th>Charges</th>
+                        <th>Amende</th>
+                        <th>Procès</th>
+                        <th>Accord</th>
+                        <th>Com</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="listeDossiers"></tbody>
+            </table>
         </div>
     </div>
 </div>
 <body>
 
-    <script>
+    <script type="module">
 
-       /* --- CONFIGURATION --- */
+     // IMPORTATION DES MODULES FIREBASE (OBLIGATOIRE POUR LE CLOUD)
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyAFJWLubNJiWIys9yHmtY--9QtDZ4hsbY0",
+  authDomain: "dawson-cabinet.firebaseapp.com",
+  projectId: "dawson-cabinet",
+  storageBucket: "dawson-cabinet.firebasestorage.app",
+  messagingSenderId: "660518713250",
+  appId: "1:660518713250:web:a00a8c615d08868ab264fb",
+  measurementId: "G-QJPKCGYCBT"
+};
+
+// INITIALISATION
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 const PRIX_COMMIS = 150000;
-const DB_USERS_KEY = "cabinet_users_v4";
-const DB_DOSSIERS_KEY = "cabinet_dossiers_v2";
-
-const DEFAULT_USERS = [
-    { name: "James Dawson", pass: "patron", grade: 0.75, role: "Président - Partenaire Principal" },
-    { name: "Arthur Martin", pass: "1234", grade: 0.65, role: "Partenaire Directeur" },
-    { name: "Paul Mariani", pass: "1234", grade: 0.65, role: "Partenaire Directeur" },
-    { name: "Robert Touille", pass: "1234", grade: 0, role: "Parajuriste" },
-    { name: "Alejandro Martinez", pass: "1234", grade: 0, role: "Parajuriste" },
-    { name: "Connor Willard", pass: "1234", grade: 0, role: "Parajuriste" },
-    { name: "Olivia Marques", pass: "1234", grade: 0, role: "Parajuriste" },
-    { name: "Aaron El Cayani", pass: "1234", grade: 0, role: "Parajuriste" },
-    { name: "Majesty Widax", pass: "1234", grade: 0, role: "Parajuriste" },
-    { name: "Giulia Mariani", pass: "1234", grade: 0, role: "Assistant Juridique" },
-    { name: "Tito Marino", pass: "1234", grade: 0.35, role: "Avocat" },
-    { name: "Harald Heyerdahl", pass: "1234", grade: 0.35, role: "Avocat" },
-    { name: "Tom Nardo", pass: "1234", grade: 0.35, role: "Avocat" },
-    { name: "Damien Walker", pass: "1234", grade: 0.35, role: "Avocat" },
-    { name: "Frank Evans", pass: "1234", grade: 0.35, role: "Avocat" },
-    { name: "Bobo Hills", pass: "1234", grade: 0.35, role: "Avocat" },
-    { name: "Sabri Ben Yusuf", pass: "1234", grade: 0.35, role: "Avocat" }
-];
 
 let currentUser = null;
-let usersList = [];
-let historiqueGlobal = [];
+let globalUsers = [];
+let globalDossiers = [];
 
-function initSystem() {
-    const savedUsers = localStorage.getItem(DB_USERS_KEY);
-    if (savedUsers) {
-        usersList = JSON.parse(savedUsers);
-    } else {
-        usersList = DEFAULT_USERS;
-        saveUsers();
-    }
-    const savedDossiers = localStorage.getItem(DB_DOSSIERS_KEY);
-    historiqueGlobal = savedDossiers ? JSON.parse(savedDossiers) : [];
-}
+// 1. ÉCOUTE EN TEMPS RÉEL : UTILISATEURS
+onSnapshot(collection(db, "users"), (snap) => {
+    globalUsers = [];
+    snap.forEach(d => globalUsers.push({id: d.id, ...d.data()}));
+});
 
-// --- FONCTIONS ADMIN (CREATION / MODIF) ---
-function creerUtilisateur() {
-    const name = document.getElementById('newUserName').value.trim();
-    const pass = document.getElementById('newUserPass').value.trim();
-    const grade = parseFloat(document.getElementById('newUserGrade').value);
-    const select = document.getElementById('newUserGrade');
-    const roleText = select.options[select.selectedIndex].text.split('(')[0].trim();
+// 2. ÉCOUTE EN TEMPS RÉEL : DOSSIERS
+onSnapshot(query(collection(db, "dossiers")), (snap) => {
+    globalDossiers = [];
+    snap.forEach(d => globalDossiers.push({id: d.id, ...d.data()}));
+    // Si connecté, mettre à jour le tableau en direct
+    if(currentUser) renderTable();
+});
 
-    if (!name || !pass) { alert("Remplissez tout !"); return; }
-    if (usersList.find(u => u.name.toLowerCase() === name.toLowerCase())) { alert("Ce nom existe déjà !"); return; }
-
-    usersList.push({ name: name, pass: pass, grade: grade, role: roleText });
-    saveUsers();
-    alert(`Compte créé pour ${name} !`);
-    document.getElementById('newUserName').value = "";
-    document.getElementById('newUserPass').value = "";
-    chargerListeEmployes();
-}
-
-function modifierGrade() {
-    const targetName = document.getElementById('editUserSelect').value;
-    const newGradeVal = parseFloat(document.getElementById('editUserGrade').value);
-    const select = document.getElementById('editUserGrade');
-    const newRoleText = select.options[select.selectedIndex].text.split('(')[0].trim();
-
-    if(!targetName || targetName === "Chargement...") return;
-    const userIndex = usersList.findIndex(u => u.name === targetName);
+// --- GESTION DE LA CONNEXION ---
+document.getElementById('btnLogin').addEventListener('click', () => {
+    const u = document.getElementById('loginUser').value.trim();
+    const p = document.getElementById('loginPass').value.trim();
     
-    if(userIndex !== -1) {
-        usersList[userIndex].grade = newGradeVal;
-        usersList[userIndex].role = newRoleText;
-        saveUsers();
-        alert(`Grade de ${targetName} mis à jour : ${newRoleText}`);
-    }
-}
-
-function chargerListeEmployes() {
-    const select = document.getElementById('editUserSelect');
-    select.innerHTML = "";
-    const sortedUsers = [...usersList].sort((a,b) => a.name.localeCompare(b.name));
-    sortedUsers.forEach(u => {
-        const opt = document.createElement("option");
-        opt.value = u.name;
-        opt.innerText = `${u.name} (Actuel: ${u.role})`;
-        select.appendChild(opt);
-    });
-}
-
-function saveUsers() { localStorage.setItem(DB_USERS_KEY, JSON.stringify(usersList)); }
-
-// --- FONCTION EXPORT PDF ---
-function exporterPDF() {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
+    // Vérification dans la liste chargée depuis le Cloud
+    const found = globalUsers.find(user => user.name.toLowerCase() === u.toLowerCase() && user.pass === p);
     
-    // Titre
-    doc.setFontSize(18);
-    doc.text("RAPPORT COMMIS D'OFFICE - DAWSON & PARTNERS", 14, 22);
-    doc.setFontSize(11);
-    doc.text(`Date : ${new Date().toLocaleDateString()}`, 14, 30);
-    doc.text(`Généré par : ${currentUser.name}`, 14, 36);
-
-    // Préparation des données pour le tableau
-    const tableData = historiqueGlobal.map(d => [
-        d.auteur,
-        d.client,
-        d.charges,
-        `${d.amende} $`,
-        d.proces ? "Oui" : "Non",
-        d.accord ? "Oui" : "Non",
-        "150 000 $",
-        `${d.gainAvocat} $`
-    ]);
-
-    // Génération du tableau
-    doc.autoTable({
-        startY: 45,
-        head: [['Avocat', 'Client', 'Charges', 'Amende', 'Procès', 'Accord', 'Facture', 'Com.']],
-        body: tableData,
-        theme: 'striped',
-        headStyles: { fillColor: [212, 175, 55] }, // Couleur Or
-        styles: { fontSize: 8 }
-    });
-
-    // Sauvegarde
-    doc.save(`Rapport_Commis_${Date.now()}.pdf`);
-}
-
-// --- LOGIQUE METIER ---
-function tenterConnexion() {
-    const inputUser = document.getElementById('loginUser').value.trim();
-    const inputPass = document.getElementById('loginPass').value.trim();
-    const userFound = usersList.find(u => u.name.toLowerCase() === inputUser.toLowerCase() && u.pass === inputPass);
-
-    if (userFound) {
-        currentUser = userFound;
+    if(found) {
+        currentUser = found;
         lancerApplication();
     } else {
-        const err = document.getElementById('loginError');
-        err.classList.remove('hidden');
+        document.getElementById('loginError').classList.remove('hidden');
     }
-}
+});
+
+document.getElementById('btnLogout').addEventListener('click', () => {
+    location.reload(); // Recharge la page pour déconnecter
+});
 
 function lancerApplication() {
     document.getElementById('login-screen').classList.add('hidden');
     document.getElementById('app-screen').classList.remove('hidden');
-    document.getElementById('app-screen').classList.add('fade-in');
-    document.body.style.alignItems = 'flex-start';
+    
+    // Mettre à jour les infos du haut
+    document.getElementById('roleBadge').innerText = currentUser.role;
 
-    document.getElementById('displayUser').innerText = currentUser.name;
-    document.getElementById('roleBadge').innerText = currentUser.role.toUpperCase();
-    document.getElementById('displayGrade').value = `${currentUser.role} (${currentUser.grade * 100}%)`;
-
-    // VERIFICATION ADMIN : DAWSON OU MARIANI
+    // Afficher panneau admin si c'est Dawson ou Mariani
     const nom = currentUser.name.toLowerCase();
-    if (nom.includes("dawson") || nom.includes("mariani")) {
+    if(nom.includes('dawson') || nom.includes('mariani')) {
         document.getElementById('adminPanel').classList.remove('hidden');
-        chargerListeEmployes();
-    } else {
-        document.getElementById('adminPanel').classList.add('hidden');
     }
-
+    
     renderTable();
 }
 
-function ajouterDossier() {
+// --- AJOUTER UN DOSSIER ---
+document.getElementById('btnAddCase').addEventListener('click', async () => {
     const client = document.getElementById('client').value;
+    if(!client) return alert("Nom du client obligatoire !");
+
     const charges = document.getElementById('charges').value;
     const amende = parseFloat(document.getElementById('amende').value) || 0;
     const proces = document.getElementById('proces').checked;
     const accord = document.getElementById('accord').checked;
-
-    if (!client) { alert("Nom du client requis"); return; }
-
-    const maPart = PRIX_COMMIS * currentUser.grade;
-    const dossier = {
-        id: Date.now(),
-        auteur: currentUser.name,
-        client: client,
-        charges: charges || "Non spécifié",
-        amende: amende,
-        proces: proces,
-        accord: accord,
-        factureEtat: PRIX_COMMIS,
-        gainAvocat: maPart
-    };
-
-    historiqueGlobal.push(dossier);
-    localStorage.setItem(DB_DOSSIERS_KEY, JSON.stringify(historiqueGlobal));
-    renderTable();
     
-    // Reset inputs
-    document.getElementById('client').value = '';
-    document.getElementById('charges').value = '';
-    document.getElementById('amende').value = '';
-    document.getElementById('proces').checked = false;
-    document.getElementById('accord').checked = false;
-}
+    const gain = PRIX_COMMIS * currentUser.grade;
 
-function supprimerDossier(id) {
-    const dossier = historiqueGlobal.find(d => d.id === id);
-    const nom = currentUser.name.toLowerCase();
-    const isAdmin = nom.includes("dawson") || nom.includes("mariani");
-    
-    if (dossier && (dossier.auteur === currentUser.name || isAdmin)) {
-        if(confirm("Supprimer ?")) {
-            historiqueGlobal = historiqueGlobal.filter(d => d.id !== id);
-            localStorage.setItem(DB_DOSSIERS_KEY, JSON.stringify(historiqueGlobal));
-            renderTable();
-        }
-    } else {
-        alert("Action impossible");
+    // ENVOI VERS FIREBASE (CLOUD)
+    try {
+        await addDoc(collection(db, "dossiers"), {
+            timestamp: Date.now(),
+            auteur: currentUser.name,
+            client: client,
+            charges: charges,
+            amende: amende,
+            proces: proces,
+            accord: accord,
+            factureEtat: PRIX_COMMIS,
+            gainAvocat: gain
+        });
+
+        // Vider les champs
+        document.getElementById('client').value = "";
+        document.getElementById('charges').value = "";
+        document.getElementById('amende').value = "";
+        document.getElementById('proces').checked = false;
+        document.getElementById('accord').checked = false;
+        
+    } catch(e) {
+        alert("Erreur d'envoi : " + e.message);
     }
-}
+});
 
+// --- AFFICHAGE DU TABLEAU ---
 function renderTable() {
     const tbody = document.getElementById('listeDossiers');
-    const searchVal = document.getElementById('search').value.toLowerCase();
-    tbody.innerHTML = '';
+    tbody.innerHTML = "";
     
-    let sumEtat = 0; let sumGain = 0; let sumAmendes = 0;
-    let listeAffiche = historiqueGlobal;
-    if(searchVal) listeAffiche = listeAffiche.filter(d => d.client.toLowerCase().includes(searchVal));
-    listeAffiche.sort((a, b) => b.id - a.id);
+    let totalEtat = 0;
+    let totalGain = 0;
+    let totalAmendes = 0;
+    
+    // Tri par date (plus récent en haut)
+    const listeTriee = [...globalDossiers].sort((a,b) => b.timestamp - a.timestamp);
 
-    listeAffiche.forEach(d => {
-        sumEtat += d.factureEtat;
-        sumAmendes += d.amende;
-        if (d.auteur === currentUser.name) sumGain += d.gainAvocat;
+    listeTriee.forEach(d => {
+        totalEtat += d.factureEtat;
+        totalAmendes += d.amende;
+        if(d.auteur === currentUser.name) totalGain += d.gainAvocat;
 
         const isMe = d.auteur === currentUser.name;
-        const nom = currentUser.name.toLowerCase();
-        const isAdmin = nom.includes("dawson") || nom.includes("mariani");
-        const deleteBtn = (isMe || isAdmin) ? `<button class="delete-btn" onclick="supprimerDossier(${d.id})">×</button>` : '';
-        const highlightUser = isMe ? "color:#fff; font-weight:bold;" : "color:#888;";
+        const isAdmin = currentUser.name.toLowerCase().includes('dawson') || currentUser.name.toLowerCase().includes('mariani');
+        
+        // Bouton supprimer visible seulement si c'est moi ou le patron
+        const delBtn = (isMe || isAdmin) ? 
+            `<button onclick="window.suppr('${d.id}')" style="color:#ff4d4d; border:none; background:none; cursor:pointer; font-size:1.2rem;">×</button>` : '';
+        
+        const styleMoi = isMe ? 'color:#fff; font-weight:bold;' : 'color:#888;';
 
-        const htmlRow = `
+        const row = `
             <tr>
-                <td style="${highlightUser}">${d.auteur}</td>
-                <td style="font-weight:600; color:#d4af37;">${d.client}</td>
-                <td style="color:#aaa; font-size:0.85rem;">${d.charges}</td>
-                <td style="font-family:monospace;">${formaterArgent(d.amende)}</td>
-                <td class="text-center">${d.proces ? '<span class="badge yes">OUI</span>' : '<span class="badge no">NON</span>'}</td>
-                <td class="text-center">${d.accord ? '<span class="badge yes">OUI</span>' : '<span class="badge no">NON</span>'}</td>
-                <td class="text-right" style="color:#aaa;">${formaterArgent(d.factureEtat)}</td>
-                <td class="text-right" style="color:#00e676; font-weight:bold;">${isMe ? '+ '+formaterArgent(d.gainAvocat) : '-'}</td>
-                <td class="text-center">${deleteBtn}</td>
+                <td style="${styleMoi}">${d.auteur}</td>
+                <td style="color:#d4af37; font-weight:600;">${d.client}</td>
+                <td style="color:#aaa; font-size:0.9rem;">${d.charges}</td>
+                <td style="font-family:monospace;">${d.amende} $</td>
+                <td>${d.proces ? '✅' : '❌'}</td>
+                <td>${d.accord ? '✅' : '❌'}</td>
+                <td style="color:#00e676; font-weight:bold;">${isMe ? '+ '+d.gainAvocat+' $' : ''}</td>
+                <td style="text-align:center;">${delBtn}</td>
             </tr>
         `;
-        tbody.innerHTML += htmlRow;
+        tbody.innerHTML += row;
     });
 
-    document.getElementById('totalEtat').innerText = formaterArgent(sumEtat);
-    document.getElementById('totalGain').innerText = formaterArgent(sumGain);
-    document.getElementById('totalAmendes').innerText = formaterArgent(sumAmendes);
+    // Mettre à jour les totaux en haut
+    document.getElementById('totalEtat').innerText = totalEtat.toLocaleString() + " $";
+    document.getElementById('totalGain').innerText = totalGain.toLocaleString() + " $";
+    document.getElementById('totalAmendes').innerText = totalAmendes.toLocaleString() + " $";
 }
 
-function filtrerTableau() { renderTable(); }
-function deconnexion() { 
-    currentUser = null; 
-    document.getElementById('app-screen').classList.add('hidden'); 
-    document.getElementById('login-screen').classList.remove('hidden'); 
-    document.body.style.alignItems = 'center';
-    document.getElementById('loginPass').value = "";
-}
-function formaterArgent(m) { return new Intl.NumberFormat('en-US').format(m).replace(/,/g, ' ') + ' $'; }
-document.getElementById("loginPass").addEventListener("keypress", function(e) { if (e.key === "Enter") tenterConnexion(); });
+// --- FONCTION SUPPRESSION (CLOUD) ---
+// On l'attache à window pour qu'elle soit accessible depuis le HTML
+window.suppr = async (id) => {
+    if(confirm("Confirmer la suppression définitive ?")) {
+        await deleteDoc(doc(db, "dossiers", id));
+    }
+};
 
-initSystem();
+// --- CRÉATION UTILISATEUR (ADMIN) ---
+document.getElementById('btnCreateUser').addEventListener('click', async () => {
+    const name = document.getElementById('newUserName').value;
+    const pass = document.getElementById('newUserPass').value;
+    const grade = parseFloat(document.getElementById('newUserGrade').value);
+    
+    // Récupérer le texte du rôle (ex: "Avocat")
+    const sel = document.getElementById('newUserGrade');
+    const role = sel.options[sel.selectedIndex].text.split('(')[0].trim();
+
+    if(!name || !pass) return alert("Remplissez tout !");
+
+    await addDoc(collection(db, "users"), {
+        name: name,
+        pass: pass,
+        grade: grade,
+        role: role
+    });
+    
+    alert("Utilisateur créé avec succès !");
+    document.getElementById('newUserName').value = "";
+    document.getElementById('newUserPass').value = "";
+});
+
+// --- EXPORT PDF ---
+window.exporterPDF = () => {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    
+    doc.text("RAPPORT CABINET DAWSON & PARTNERS", 14, 20);
+    doc.setFontSize(10);
+    doc.text("Généré par " + currentUser.name, 14, 26);
+    
+    const data = globalDossiers.map(d => [
+        d.auteur, d.client, d.charges, d.amende + " $", d.gainAvocat + " $"
+    ]);
+    
+    doc.autoTable({
+        startY: 35,
+        head: [['Avocat', 'Client', 'Charges', 'Amende', 'Com.']],
+        body: data,
+        theme: 'striped',
+        headStyles: { fillColor: [212, 175, 55] }
+    });
+    
+    doc.save("Rapport_Cabinet.pdf");
+};
 
 
     </script>
