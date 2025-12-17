@@ -2,250 +2,349 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Intranet Cabinet Avocat</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Intranet Dawson & Partners</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
     <style>
         
-        :root {
-    --gold: #c5a059;       /* Couleur Or du cabinet */
-    --gold-dark: #b08d4b;
-    --bg-dark: #1e1e1e;    /* Fond sombre */
-    --panel: #2b2b2b;      /* Fond des panneaux */
-    --text: #e0e0e0;       /* Couleur texte */
-    --input-bg: #3a3a3a;
-    --green: #85bb65;      /* Couleur argent */
-    --red: #d9534f;
+       /* --- VARIABLES & RESET --- */
+:root {
+    --bg-dark: #0f0f13;
+    --panel-bg: rgba(30, 30, 35, 0.85);
+    --gold: #d4af37;
+    --gold-glow: rgba(212, 175, 55, 0.4);
+    --text-main: #ffffff;
+    --text-muted: #a0a0a0;
+    --danger: #ff4d4d;
+    --success: #00e676;
+    --font-main: 'Segoe UI', system-ui, -apple-system, sans-serif;
 }
+
+* { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
 
 body {
-    font-family: 'Segoe UI', sans-serif;
     background-color: var(--bg-dark);
-    color: var(--text);
-    margin: 0;
-    padding: 20px;
+    background-image: radial-gradient(circle at top right, #1a1a20 0%, #0f0f13 100%);
+    color: var(--text-main);
+    font-family: var(--font-main);
+    min-height: 100vh;
+    width: 100vw;
     display: flex;
     justify-content: center;
-}
-
-.container {
-    width: 100%;
-    max-width: 1200px;
-    background-color: var(--panel);
-    padding: 30px;
-    border-radius: 8px;
-    border-top: 4px solid var(--gold);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-}
-
-h1 {
-    color: var(--gold);
-    text-align: center;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    margin-bottom: 30px;
-    border-bottom: 1px solid #444;
-    padding-bottom: 20px;
-}
-
-/* --- Formulaire --- */
-.form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr; /* 4 colonnes */
-    gap: 15px;
-    background: #222;
-    padding: 20px;
-    border-radius: 6px;
-    margin-bottom: 25px;
-}
-
-.full-width { grid-column: span 4; }
-.half-width { grid-column: span 2; }
-
-.form-group { display: flex; flex-direction: column; }
-
-label {
-    font-size: 0.8rem;
-    color: #888;
-    margin-bottom: 5px;
-    text-transform: uppercase;
-    font-weight: bold;
-}
-
-input, select {
-    background: var(--input-bg);
-    border: 1px solid #444;
-    color: white;
-    padding: 10px;
-    border-radius: 4px;
-    font-size: 1rem;
-}
-
-input:focus, select:focus {
-    outline: none;
-    border-color: var(--gold);
-}
-
-/* Checkboxes stylisées */
-.checkbox-container {
-    display: flex;
     align-items: center;
-    background: var(--input-bg);
-    padding: 10px;
-    border: 1px solid #444;
-    border-radius: 4px;
-    cursor: pointer;
-}
-.checkbox-container input { margin-right: 10px; cursor: pointer; }
-.checkbox-container label { margin: 0; cursor: pointer; color: #fff; }
-
-/* Bouton */
-button.btn-save {
-    background-color: var(--gold);
-    color: #111;
-    font-weight: bold;
-    border: none;
-    padding: 15px;
-    border-radius: 4px;
-    cursor: pointer;
-    text-transform: uppercase;
-    font-size: 1rem;
-    transition: 0.2s;
-    grid-column: span 4;
-    margin-top: 10px;
-}
-button.btn-save:hover { background-color: var(--gold-dark); }
-
-/* --- Tableau --- */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.95rem;
+    overflow-x: hidden;
 }
 
-th {
-    text-align: left;
-    color: var(--gold);
-    padding: 15px 10px;
-    border-bottom: 2px solid #444;
-    font-size: 0.8rem;
-    text-transform: uppercase;
+.hidden { display: none !important; }
+.fade-in { animation: fadeIn 0.5s ease forwards; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* GLASSMORPHISM */
+.glass-panel {
+    background: var(--panel-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
-td {
-    padding: 15px 10px;
-    border-bottom: 1px solid #333;
-    vertical-align: middle;
+/* --- LOGIN --- */
+#login-screen { width: 90%; max-width: 420px; padding: 40px; text-align: center; border-top: 4px solid var(--gold); }
+.logo-icon { font-size: 3rem; margin-bottom: 10px; text-shadow: 0 0 20px var(--gold-glow); }
+.error-msg { color: var(--danger); font-size: 0.9rem; margin: 10px 0; background: rgba(255, 77, 77, 0.1); padding: 5px; border-radius: 4px; }
+
+/* --- ADMIN PANEL --- */
+.admin-section {
+    padding: 25px; margin-bottom: 25px; 
+    border: 1px solid var(--gold); 
+    background: rgba(212, 175, 55, 0.05); 
 }
 
-tr:hover { background-color: #333; }
+/* --- APP LAYOUT --- */
+#app-screen { width: 100%; max-width: 1400px; padding: 20px; margin: 0 auto; }
 
-.badge {
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    font-weight: bold;
+.navbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; margin-bottom: 25px; }
+.nav-brand { display: flex; align-items: center; gap: 15px; }
+.badge-role { background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; color: var(--gold); }
+.nav-user { display: flex; align-items: center; gap: 15px; }
+.user-name { font-weight: bold; color: #fff; }
+
+.btn-logout { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 10px; border-radius: 8px; cursor: pointer; }
+.btn-logout:hover { color: var(--danger); border-color: var(--danger); }
+
+/* STATS & FORM */
+.stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
+.stat-card { padding: 20px; text-align: center; border-bottom: 3px solid transparent; }
+.stat-card.highlight-gold { border-bottom-color: var(--gold); }
+.stat-card h3 { font-size: 1.6rem; margin-top: 5px; color: #fff; }
+.money.gain { color: var(--success); }
+
+.form-section { padding: 25px; margin-bottom: 25px; }
+.section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
+.tag-price { background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-family: monospace; color: var(--gold); }
+
+/* INPUTS */
+.input-group { margin-bottom: 15px; text-align: left; }
+label { display: block; color: var(--text-muted); font-size: 0.75rem; margin-bottom: 6px; text-transform: uppercase; font-weight: 600; }
+input, select {
+    width: 100%; padding: 12px; background: rgba(0, 0, 0, 0.3); 
+    border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: #fff; font-size: 1rem;
 }
-.badge-yes { background: rgba(133, 187, 101, 0.2); color: var(--green); }
-.badge-no { background: rgba(217, 83, 79, 0.2); color: var(--red); }
+input:focus, select:focus { border-color: var(--gold); box-shadow: 0 0 10px var(--gold-glow); }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 15px; align-items: end; }
+.span-2 { grid-column: span 2; }
+.span-full { grid-column: 1 / -1; margin-top: 10px; }
 
-.money { font-family: 'Consolas', monospace; color: #bbb; }
-.money.gain { color: var(--green); font-weight: bold; }
-
-/* --- Totaux (Footer) --- */
-.footer-totals {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 30px;
-    background: #222;
-    padding: 20px;
-    border-radius: 6px;
+/* BOUTONS */
+.btn-primary {
+    width: 100%; padding: 14px; background: linear-gradient(135deg, var(--gold), #b38f26);
+    color: #000; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; text-transform: uppercase;
 }
+.btn-primary:hover { transform: translateY(-2px); }
 
-.total-card { text-align: center; width: 30%; }
-.total-card span { display: block; font-size: 0.8rem; color: #888; text-transform: uppercase; }
-.total-card div { font-size: 1.5rem; color: var(--gold); margin-top: 5px; }
-
-.delete-btn {
-    background: none; border: none; cursor: pointer; font-size: 1.2rem;
-    opacity: 0.5; transition: 0.2s;
+/* NOUVEAU : BOUTON PDF */
+.btn-pdf {
+    background: #fff; color: #000; font-weight: bold; border: none; padding: 10px 15px; 
+    border-radius: 6px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 5px;
 }
-.delete-btn:hover { opacity: 1; transform: scale(1.1); }
+.btn-pdf:hover { background: #eee; transform: translateY(-2px); }
+
+/* CHECKBOX */
+.toggles-wrapper { display: flex; gap: 20px; height: 48px; align-items: center; }
+.toggle-control { display: flex; align-items: center; cursor: pointer; }
+.toggle-control input { display: none; }
+.toggle-control .control { width: 40px; height: 22px; background: rgba(255,255,255,0.1); border-radius: 20px; position: relative; margin-right: 10px; transition: 0.3s; }
+.toggle-control .control::after { content:''; position: absolute; left: 2px; top: 2px; width: 18px; height: 18px; background: #fff; border-radius: 50%; transition: 0.3s; }
+.toggle-control input:checked + .control { background: var(--gold); }
+.toggle-control input:checked + .control::after { transform: translateX(18px); }
+.toggle-control .label { font-size: 0.9rem; color: #ccc; }
+
+/* TABLEAU & ACTIONS */
+.table-section { padding: 0; overflow: hidden; }
+.table-header { padding: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+.actions-header { display: flex; gap: 10px; align-items: center; }
+.table-responsive { overflow-x: auto; width: 100%; }
+table { width: 100%; border-collapse: collapse; min-width: 800px; }
+th { text-align: left; padding: 15px; color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.1); }
+td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; }
+.text-right { text-align: right; }
+.text-center { text-align: center; }
+.badge { padding: 4px 10px; border-radius: 50px; font-size: 0.7rem; font-weight: bold; }
+.badge.yes { background: rgba(0, 230, 118, 0.15); color: var(--success); }
+.badge.no { background: rgba(255, 77, 77, 0.15); color: var(--danger); }
+.delete-btn { background: none; border: none; color: #666; cursor: pointer; padding: 5px; font-size: 1.1rem; }
+.delete-btn:hover { color: var(--danger); }
+
+/* MOBILE */
+@media (max-width: 900px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .span-2 { grid-column: span 1; }
+    .navbar { flex-direction: column; gap: 15px; align-items: flex-start; }
+    .nav-brand, .nav-user { width: 100%; justify-content: space-between; }
+    #app-screen { padding: 10px; }
+    .table-header { flex-direction: column; align-items: stretch; }
+    .actions-header { justify-content: space-between; }
+}
+        
+
 
     </style>
 </head>
-    <div class="container">
-    <h1>⚖️ Gestion Commis d'Office</h1>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
-    <div class="form-grid">
-        <div class="form-group half-width">
-            <label>Nom du Client</label>
-            <input type="text" id="client" placeholder="Ex: Jean Dupont">
-        </div>
-        <div class="form-group half-width">
-            <label>Charges / Chefs d'accusation</label>
-            <input type="text" id="charges" placeholder="Ex: Vol de véhicule, Outrage...">
-        </div>
+<div class="bg-animation"></div>
 
-        <div class="form-group">
-    <label>Votre Grade</label>
-    <select id="grade">
-        <option value="0">Parajuriste (0%)</option>
-        
-        <option value="0.30">Avocat Jr (30%)</option>
-        
-        <option value="0.35" selected>Avocat (35%)</option>
-        
-        <option value="0.50">Partenaire Jr (50%)</option>
-        
-        <option value="0.75">Partenaire Pr (75%)</option>
-    </select>
-</div>
-        <div class="form-group">
-            <label>Amende Client ($)</label>
-            <input type="number" id="amende" placeholder="0">
-        </div>
-        <div class="form-group checkbox-container">
-            <input type="checkbox" id="proces">
-            <label for="proces">Procès effectué ?</label>
-        </div>
-        <div class="form-group checkbox-container">
-            <input type="checkbox" id="accord">
-            <label for="accord">Accord trouvé ?</label>
-        </div>
-
-        <button class="btn-save" onclick="ajouterDossier()">Enregistrer le Dossier (+150 000$)</button>
+<div id="login-screen" class="glass-panel fade-in">
+    <div class="login-header">
+        <div class="logo-icon">⚖️</div>
+        <h2>Dawson & Partners</h2>
+        <p>Intranet Sécurisé</p>
     </div>
+    
+    <div class="input-group">
+        <label>Identifiant (Nom Prénom)</label>
+        <input type="text" id="loginUser" placeholder="Ex: James Dawson">
+    </div>
+    
+    <div class="input-group">
+        <label>Mot de passe</label>
+        <input type="password" id="loginPass" placeholder="••••••">
+    </div>
+    
+    <p id="loginError" class="error-msg hidden">⛔ Identifiants incorrects</p>
 
-    <table>
-        <thead>
-            <tr>
-                <th width="15%">Client</th>
-                <th width="25%">Charges</th>
-                <th width="10%">Amende</th>
-                <th width="8%">Procès</th>
-                <th width="8%">Accord</th>
-                <th width="12%">Facture État</th>
-                <th width="12%">Votre Part</th>
-                <th width="5%"></th>
-            </tr>
-        </thead>
-        <tbody id="listeDossiers">
-            </tbody>
-    </table>
+    <button class="btn-primary" onclick="tenterConnexion()">Accéder au Portail</button>
+</div>
 
-    <div class="footer-totals">
-        <div class="total-card">
-            <span>Total Facturé (État)</span>
-            <div id="totalEtat" class="money">0 $</div>
+<div id="app-screen" class="hidden">
+    
+    <nav class="navbar glass-panel">
+        <div class="nav-brand">
+            <span class="logo">⚖️</span>
+            <div class="brand-text">
+                <h1>Dawson & Partners</h1>
+                <span id="roleBadge" class="badge-role">AVOCAT</span>
+            </div>
         </div>
-        <div class="total-card">
-            <span>Votre Gain Total</span>
-            <div id="totalGain" class="money gain">0 $</div>
+        <div class="nav-user">
+            <div class="user-details">
+                <span class="welcome-label">Connecté en tant que</span>
+                <span id="displayUser" class="user-name">...</span>
+            </div>
+            <button class="btn-logout" onclick="deconnexion()">Déconnexion</button>
         </div>
-        <div class="total-card">
-            <span>Total Amendes</span>
-            <div id="totalAmendes" style="color:#fff;">0 $</div>
+    </nav>
+
+    <div class="main-content">
+        
+        <div id="adminPanel" class="admin-section glass-panel hidden">
+            
+            <div class="section-header">
+                <h3>👑 Gestion RH - Création</h3>
+            </div>
+            <div class="form-grid">
+                <div class="input-group">
+                    <label>Nom</label>
+                    <input type="text" id="newUserName" placeholder="Prénom Nom">
+                </div>
+                <div class="input-group">
+                    <label>Mot de Passe</label>
+                    <input type="text" id="newUserPass" placeholder="Secret">
+                </div>
+                <div class="input-group">
+                    <label>Grade Initial</label>
+                    <select id="newUserGrade">
+                        <option value="0.75">Président (75%)</option>
+                        <option value="0.65">Partenaire Directeur (65%)</option>
+                        <option value="0.60">Partenaire Sénior (60%)</option>
+                        <option value="0.55">Partenaire (55%)</option>
+                        <option value="0.50">Partenaire Junior (50%)</option>
+                        <option value="0.40">Avocat Sénior (40%)</option>
+                        <option value="0.35" selected>Avocat (35%)</option>
+                        <option value="0.30">Avocat Junior (30%)</option>
+                        <option value="0">Parajuriste (0%)</option>
+                        <option value="0">Assistant Juridique (0%)</option>
+                    </select>
+                </div>
+                <button class="btn-primary" onclick="creerUtilisateur()">Créer</button>
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid rgba(212, 175, 55, 0.3); margin: 20px 0;">
+
+            <div class="section-header">
+                <h3>✏️ Modifier Grade</h3>
+            </div>
+            <div class="form-grid">
+                <div class="input-group span-2">
+                    <label>Employé</label>
+                    <select id="editUserSelect"><option>Chargement...</option></select>
+                </div>
+                <div class="input-group">
+                    <label>Nouveau Grade</label>
+                    <select id="editUserGrade">
+                        <option value="0.75">Président (75%)</option>
+                        <option value="0.65">Partenaire Directeur (65%)</option>
+                        <option value="0.60">Partenaire Sénior (60%)</option>
+                        <option value="0.55">Partenaire (55%)</option>
+                        <option value="0.50">Partenaire Junior (50%)</option>
+                        <option value="0.40">Avocat Sénior (40%)</option>
+                        <option value="0.35" selected>Avocat (35%)</option>
+                        <option value="0.30">Avocat Junior (30%)</option>
+                        <option value="0">Parajuriste (0%)</option>
+                        <option value="0">Assistant Juridique (0%)</option>
+                    </select>
+                </div>
+                <button class="btn-primary" onclick="modifierGrade()">Mettre à jour</button>
+            </div>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-card glass-panel">
+                <span class="stat-label">Total Facturé (Cabinet)</span>
+                <h3 id="totalEtat" class="money">0 $</h3>
+            </div>
+            <div class="stat-card glass-panel highlight-gold">
+                <span class="stat-label" id="labelTotalGain">Vos Commissions</span>
+                <h3 id="totalGain" class="money gain">0 $</h3>
+            </div>
+            <div class="stat-card glass-panel">
+                <span class="stat-label">Amendes Clients</span>
+                <h3 id="totalAmendes" class="money">0 $</h3>
+            </div>
+        </div>
+
+        <div class="form-section glass-panel">
+            <div class="section-header">
+                <h3>Nouveau Dossier</h3>
+                <span class="tag-price">+ 150 000 $</span>
+            </div>
+
+            <div class="form-grid">
+                <div class="input-group">
+                    <label>Client</label>
+                    <input type="text" id="client" placeholder="Nom Prénom">
+                </div>
+                <div class="input-group span-2">
+                    <label>Charges</label>
+                    <input type="text" id="charges" placeholder="Délits...">
+                </div>
+                <div class="input-group">
+                    <label>Grade (Auto)</label>
+                    <input type="text" id="displayGrade" disabled style="opacity: 0.6;">
+                </div>
+                <div class="input-group">
+                    <label>Amende ($)</label>
+                    <input type="number" id="amende" placeholder="0">
+                </div>
+                <div class="toggles-wrapper">
+                    <label class="toggle-control">
+                        <input type="checkbox" id="proces">
+                        <span class="control"></span>
+                        <span class="label">Procès ?</span>
+                    </label>
+                    <label class="toggle-control">
+                        <input type="checkbox" id="accord">
+                        <span class="control"></span>
+                        <span class="label">Accord ?</span>
+                    </label>
+                </div>
+                <button class="btn-primary span-full" onclick="ajouterDossier()">Enregistrer le Dossier</button>
+            </div>
+        </div>
+
+        <div class="table-section glass-panel">
+            <div class="table-header">
+                <h3>Historique</h3>
+                <div class="actions-header">
+                    <button class="btn-pdf" onclick="exporterPDF()">📄 Exporter PDF</button>
+                    <div class="search-box">
+                        <input type="text" id="search" placeholder="Rechercher..." onkeyup="filtrerTableau()">
+                    </div>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Avocat</th>
+                            <th>Client</th>
+                            <th>Charges</th>
+                            <th>Amende</th>
+                            <th class="text-center">Procès</th>
+                            <th class="text-center">Accord</th>
+                            <th class="text-right">Facture</th>
+                            <th class="text-right">Com</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="listeDossiers"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
@@ -253,32 +352,185 @@ tr:hover { background-color: #333; }
 
     <script>
 
-       // --- CONFIGURATION ---
+       /* --- CONFIGURATION --- */
 const PRIX_COMMIS = 150000;
-let historique = JSON.parse(localStorage.getItem('avocat_db_v3')) || [];
+const DB_USERS_KEY = "cabinet_users_v4";
+const DB_DOSSIERS_KEY = "cabinet_dossiers_v2";
 
-// --- FONCTIONS ---
+const DEFAULT_USERS = [
+    { name: "James Dawson", pass: "patron", grade: 0.75, role: "Président - Partenaire Principal" },
+    { name: "Arthur Martin", pass: "1234", grade: 0.65, role: "Partenaire Directeur" },
+    { name: "Paul Mariani", pass: "1234", grade: 0.65, role: "Partenaire Directeur" },
+    { name: "Robert Touille", pass: "1234", grade: 0, role: "Parajuriste" },
+    { name: "Alejandro Martinez", pass: "1234", grade: 0, role: "Parajuriste" },
+    { name: "Connor Willard", pass: "1234", grade: 0, role: "Parajuriste" },
+    { name: "Olivia Marques", pass: "1234", grade: 0, role: "Parajuriste" },
+    { name: "Aaron El Cayani", pass: "1234", grade: 0, role: "Parajuriste" },
+    { name: "Majesty Widax", pass: "1234", grade: 0, role: "Parajuriste" },
+    { name: "Giulia Mariani", pass: "1234", grade: 0, role: "Assistant Juridique" },
+    { name: "Tito Marino", pass: "1234", grade: 0.35, role: "Avocat" },
+    { name: "Harald Heyerdahl", pass: "1234", grade: 0.35, role: "Avocat" },
+    { name: "Tom Nardo", pass: "1234", grade: 0.35, role: "Avocat" },
+    { name: "Damien Walker", pass: "1234", grade: 0.35, role: "Avocat" },
+    { name: "Frank Evans", pass: "1234", grade: 0.35, role: "Avocat" },
+    { name: "Bobo Hills", pass: "1234", grade: 0.35, role: "Avocat" },
+    { name: "Sabri Ben Yusuf", pass: "1234", grade: 0.35, role: "Avocat" }
+];
+
+let currentUser = null;
+let usersList = [];
+let historiqueGlobal = [];
+
+function initSystem() {
+    const savedUsers = localStorage.getItem(DB_USERS_KEY);
+    if (savedUsers) {
+        usersList = JSON.parse(savedUsers);
+    } else {
+        usersList = DEFAULT_USERS;
+        saveUsers();
+    }
+    const savedDossiers = localStorage.getItem(DB_DOSSIERS_KEY);
+    historiqueGlobal = savedDossiers ? JSON.parse(savedDossiers) : [];
+}
+
+// --- FONCTIONS ADMIN (CREATION / MODIF) ---
+function creerUtilisateur() {
+    const name = document.getElementById('newUserName').value.trim();
+    const pass = document.getElementById('newUserPass').value.trim();
+    const grade = parseFloat(document.getElementById('newUserGrade').value);
+    const select = document.getElementById('newUserGrade');
+    const roleText = select.options[select.selectedIndex].text.split('(')[0].trim();
+
+    if (!name || !pass) { alert("Remplissez tout !"); return; }
+    if (usersList.find(u => u.name.toLowerCase() === name.toLowerCase())) { alert("Ce nom existe déjà !"); return; }
+
+    usersList.push({ name: name, pass: pass, grade: grade, role: roleText });
+    saveUsers();
+    alert(`Compte créé pour ${name} !`);
+    document.getElementById('newUserName').value = "";
+    document.getElementById('newUserPass').value = "";
+    chargerListeEmployes();
+}
+
+function modifierGrade() {
+    const targetName = document.getElementById('editUserSelect').value;
+    const newGradeVal = parseFloat(document.getElementById('editUserGrade').value);
+    const select = document.getElementById('editUserGrade');
+    const newRoleText = select.options[select.selectedIndex].text.split('(')[0].trim();
+
+    if(!targetName || targetName === "Chargement...") return;
+    const userIndex = usersList.findIndex(u => u.name === targetName);
+    
+    if(userIndex !== -1) {
+        usersList[userIndex].grade = newGradeVal;
+        usersList[userIndex].role = newRoleText;
+        saveUsers();
+        alert(`Grade de ${targetName} mis à jour : ${newRoleText}`);
+    }
+}
+
+function chargerListeEmployes() {
+    const select = document.getElementById('editUserSelect');
+    select.innerHTML = "";
+    const sortedUsers = [...usersList].sort((a,b) => a.name.localeCompare(b.name));
+    sortedUsers.forEach(u => {
+        const opt = document.createElement("option");
+        opt.value = u.name;
+        opt.innerText = `${u.name} (Actuel: ${u.role})`;
+        select.appendChild(opt);
+    });
+}
+
+function saveUsers() { localStorage.setItem(DB_USERS_KEY, JSON.stringify(usersList)); }
+
+// --- FONCTION EXPORT PDF ---
+function exporterPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    
+    // Titre
+    doc.setFontSize(18);
+    doc.text("RAPPORT COMMIS D'OFFICE - DAWSON & PARTNERS", 14, 22);
+    doc.setFontSize(11);
+    doc.text(`Date : ${new Date().toLocaleDateString()}`, 14, 30);
+    doc.text(`Généré par : ${currentUser.name}`, 14, 36);
+
+    // Préparation des données pour le tableau
+    const tableData = historiqueGlobal.map(d => [
+        d.auteur,
+        d.client,
+        d.charges,
+        `${d.amende} $`,
+        d.proces ? "Oui" : "Non",
+        d.accord ? "Oui" : "Non",
+        "150 000 $",
+        `${d.gainAvocat} $`
+    ]);
+
+    // Génération du tableau
+    doc.autoTable({
+        startY: 45,
+        head: [['Avocat', 'Client', 'Charges', 'Amende', 'Procès', 'Accord', 'Facture', 'Com.']],
+        body: tableData,
+        theme: 'striped',
+        headStyles: { fillColor: [212, 175, 55] }, // Couleur Or
+        styles: { fontSize: 8 }
+    });
+
+    // Sauvegarde
+    doc.save(`Rapport_Commis_${Date.now()}.pdf`);
+}
+
+// --- LOGIQUE METIER ---
+function tenterConnexion() {
+    const inputUser = document.getElementById('loginUser').value.trim();
+    const inputPass = document.getElementById('loginPass').value.trim();
+    const userFound = usersList.find(u => u.name.toLowerCase() === inputUser.toLowerCase() && u.pass === inputPass);
+
+    if (userFound) {
+        currentUser = userFound;
+        lancerApplication();
+    } else {
+        const err = document.getElementById('loginError');
+        err.classList.remove('hidden');
+    }
+}
+
+function lancerApplication() {
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('app-screen').classList.remove('hidden');
+    document.getElementById('app-screen').classList.add('fade-in');
+    document.body.style.alignItems = 'flex-start';
+
+    document.getElementById('displayUser').innerText = currentUser.name;
+    document.getElementById('roleBadge').innerText = currentUser.role.toUpperCase();
+    document.getElementById('displayGrade').value = `${currentUser.role} (${currentUser.grade * 100}%)`;
+
+    // VERIFICATION ADMIN : DAWSON OU MARIANI
+    const nom = currentUser.name.toLowerCase();
+    if (nom.includes("dawson") || nom.includes("mariani")) {
+        document.getElementById('adminPanel').classList.remove('hidden');
+        chargerListeEmployes();
+    } else {
+        document.getElementById('adminPanel').classList.add('hidden');
+    }
+
+    renderTable();
+}
 
 function ajouterDossier() {
-    // 1. Récupérer les valeurs
     const client = document.getElementById('client').value;
     const charges = document.getElementById('charges').value;
-    const gradePourcentage = parseFloat(document.getElementById('grade').value);
     const amende = parseFloat(document.getElementById('amende').value) || 0;
     const proces = document.getElementById('proces').checked;
     const accord = document.getElementById('accord').checked;
 
-    if (client.trim() === "") {
-        alert("Il faut au moins le nom du client !");
-        return;
-    }
+    if (!client) { alert("Nom du client requis"); return; }
 
-    // 2. Calculs
-    const maPart = PRIX_COMMIS * gradePourcentage;
-
-    // 3. Créer l'objet
+    const maPart = PRIX_COMMIS * currentUser.grade;
     const dossier = {
         id: Date.now(),
+        auteur: currentUser.name,
         client: client,
         charges: charges || "Non spécifié",
         amende: amende,
@@ -288,61 +540,11 @@ function ajouterDossier() {
         gainAvocat: maPart
     };
 
-    // 4. Sauvegarder
-    historique.push(dossier);
-    sauvegarderEtAfficher();
-    resetFormulaire();
-}
-
-function supprimerDossier(id) {
-    if(confirm("Supprimer ce dossier ?")) {
-        historique = historique.filter(d => d.id !== id);
-        sauvegarderEtAfficher();
-    }
-}
-
-function sauvegarderEtAfficher() {
-    // Sauvegarde locale
-    localStorage.setItem('avocat_db_v3', JSON.stringify(historique));
+    historiqueGlobal.push(dossier);
+    localStorage.setItem(DB_DOSSIERS_KEY, JSON.stringify(historiqueGlobal));
+    renderTable();
     
-    // Affichage Tableau
-    const tbody = document.getElementById('listeDossiers');
-    tbody.innerHTML = '';
-    
-    let sumEtat = 0;
-    let sumGain = 0;
-    let sumAmendes = 0;
-
-    // On inverse pour avoir le dernier en haut
-    const listeInverse = [...historique].reverse();
-
-    listeInverse.forEach(d => {
-        sumEtat += d.factureEtat;
-        sumGain += d.gainAvocat;
-        sumAmendes += d.amende;
-
-        const htmlRow = `
-            <tr>
-                <td style="font-weight:bold; color:#fff;">${d.client}</td>
-                <td style="font-style:italic; color:#aaa;">${d.charges}</td>
-                <td class="money">${formaterArgent(d.amende)}</td>
-                <td>${d.proces ? '<span class="badge badge-yes">OUI</span>' : '<span class="badge badge-no">NON</span>'}</td>
-                <td>${d.accord ? '<span class="badge badge-yes">OUI</span>' : '<span class="badge badge-no">NON</span>'}</td>
-                <td class="money">${formaterArgent(d.factureEtat)}</td>
-                <td class="money gain">+ ${formaterArgent(d.gainAvocat)}</td>
-                <td><button class="delete-btn" onclick="supprimerDossier(${d.id})">🗑️</button></td>
-            </tr>
-        `;
-        tbody.innerHTML += htmlRow;
-    });
-
-    // Mise à jour des totaux
-    document.getElementById('totalEtat').innerText = formaterArgent(sumEtat);
-    document.getElementById('totalGain').innerText = formaterArgent(sumGain);
-    document.getElementById('totalAmendes').innerText = formaterArgent(sumAmendes);
-}
-
-function resetFormulaire() {
+    // Reset inputs
     document.getElementById('client').value = '';
     document.getElementById('charges').value = '';
     document.getElementById('amende').value = '';
@@ -350,12 +552,77 @@ function resetFormulaire() {
     document.getElementById('accord').checked = false;
 }
 
-function formaterArgent(montant) {
-    return new Intl.NumberFormat('en-US').format(montant).replace(/,/g, ' ') + ' $';
+function supprimerDossier(id) {
+    const dossier = historiqueGlobal.find(d => d.id === id);
+    const nom = currentUser.name.toLowerCase();
+    const isAdmin = nom.includes("dawson") || nom.includes("mariani");
+    
+    if (dossier && (dossier.auteur === currentUser.name || isAdmin)) {
+        if(confirm("Supprimer ?")) {
+            historiqueGlobal = historiqueGlobal.filter(d => d.id !== id);
+            localStorage.setItem(DB_DOSSIERS_KEY, JSON.stringify(historiqueGlobal));
+            renderTable();
+        }
+    } else {
+        alert("Action impossible");
+    }
 }
 
-// Lancer au démarrage
-sauvegarderEtAfficher();
+function renderTable() {
+    const tbody = document.getElementById('listeDossiers');
+    const searchVal = document.getElementById('search').value.toLowerCase();
+    tbody.innerHTML = '';
+    
+    let sumEtat = 0; let sumGain = 0; let sumAmendes = 0;
+    let listeAffiche = historiqueGlobal;
+    if(searchVal) listeAffiche = listeAffiche.filter(d => d.client.toLowerCase().includes(searchVal));
+    listeAffiche.sort((a, b) => b.id - a.id);
+
+    listeAffiche.forEach(d => {
+        sumEtat += d.factureEtat;
+        sumAmendes += d.amende;
+        if (d.auteur === currentUser.name) sumGain += d.gainAvocat;
+
+        const isMe = d.auteur === currentUser.name;
+        const nom = currentUser.name.toLowerCase();
+        const isAdmin = nom.includes("dawson") || nom.includes("mariani");
+        const deleteBtn = (isMe || isAdmin) ? `<button class="delete-btn" onclick="supprimerDossier(${d.id})">×</button>` : '';
+        const highlightUser = isMe ? "color:#fff; font-weight:bold;" : "color:#888;";
+
+        const htmlRow = `
+            <tr>
+                <td style="${highlightUser}">${d.auteur}</td>
+                <td style="font-weight:600; color:#d4af37;">${d.client}</td>
+                <td style="color:#aaa; font-size:0.85rem;">${d.charges}</td>
+                <td style="font-family:monospace;">${formaterArgent(d.amende)}</td>
+                <td class="text-center">${d.proces ? '<span class="badge yes">OUI</span>' : '<span class="badge no">NON</span>'}</td>
+                <td class="text-center">${d.accord ? '<span class="badge yes">OUI</span>' : '<span class="badge no">NON</span>'}</td>
+                <td class="text-right" style="color:#aaa;">${formaterArgent(d.factureEtat)}</td>
+                <td class="text-right" style="color:#00e676; font-weight:bold;">${isMe ? '+ '+formaterArgent(d.gainAvocat) : '-'}</td>
+                <td class="text-center">${deleteBtn}</td>
+            </tr>
+        `;
+        tbody.innerHTML += htmlRow;
+    });
+
+    document.getElementById('totalEtat').innerText = formaterArgent(sumEtat);
+    document.getElementById('totalGain').innerText = formaterArgent(sumGain);
+    document.getElementById('totalAmendes').innerText = formaterArgent(sumAmendes);
+}
+
+function filtrerTableau() { renderTable(); }
+function deconnexion() { 
+    currentUser = null; 
+    document.getElementById('app-screen').classList.add('hidden'); 
+    document.getElementById('login-screen').classList.remove('hidden'); 
+    document.body.style.alignItems = 'center';
+    document.getElementById('loginPass').value = "";
+}
+function formaterArgent(m) { return new Intl.NumberFormat('en-US').format(m).replace(/,/g, ' ') + ' $'; }
+document.getElementById("loginPass").addEventListener("keypress", function(e) { if (e.key === "Enter") tenterConnexion(); });
+
+initSystem();
+
 
     </script>
 
