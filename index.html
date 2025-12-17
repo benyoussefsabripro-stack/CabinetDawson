@@ -410,8 +410,10 @@ td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 
 
     <script>
 
-       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+console.log("1. Le script démarre...");
 
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
@@ -424,52 +426,77 @@ const firebaseConfig = {
   measurementId: "G-QJPKCGYCBT"
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const PRIX_COMMIS = 150000;
+let app, db;
+try {
+    app = initializeApp(firebaseConfig);
+    db = getFirestore(app);
+    console.log("2. Firebase connecté avec succès !");
+} catch (e) {
+    console.error("ERREUR FIREBASE : As-tu mis tes clés ?", e);
+    alert("ERREUR : Vérifie tes clés Firebase dans le code !");
+}
 
+const PRIX_COMMIS = 150000;
 let currentUser = null;
 let globalUsers = [];
 let globalDossiers = [];
 
 // --- ECOUTEURS FIREBASE ---
-const qUsers = query(collection(db, "users"));
-onSnapshot(qUsers, (snapshot) => {
-    globalUsers = [];
-    snapshot.forEach((doc) => globalUsers.push({ id: doc.id, ...doc.data() }));
-    if(currentUser && !document.getElementById('adminPanel').classList.contains('hidden')) chargerSelectEmployes();
-});
+try {
+    const qUsers = query(collection(db, "users"));
+    onSnapshot(qUsers, (snapshot) => {
+        globalUsers = [];
+        snapshot.forEach((doc) => globalUsers.push({ id: doc.id, ...doc.data() }));
+        console.log("3. Utilisateurs chargés :", globalUsers.length);
+    });
 
-const qDossiers = query(collection(db, "dossiers"));
-onSnapshot(qDossiers, (snapshot) => {
-    globalDossiers = [];
-    snapshot.forEach((doc) => globalDossiers.push({ id: doc.id, ...doc.data() }));
-    if(currentUser) window.renderTable();
-});
+    const qDossiers = query(collection(db, "dossiers"));
+    onSnapshot(qDossiers, (snapshot) => {
+        globalDossiers = [];
+        snapshot.forEach((doc) => globalDossiers.push({ id: doc.id, ...doc.data() }));
+        if(currentUser) window.renderTable();
+    });
+} catch (error) {
+    console.error("Erreur lecture Database :", error);
+}
 
-// --- NAVIGATION LOGIC ---
+// --- BOUTON DE CONNEXION ---
+// On attend que la page soit totalement chargée pour attacher le clic
+window.onload = function() {
+    const btnLogin = document.getElementById('btnLogin');
+    if(btnLogin) {
+        btnLogin.addEventListener('click', () => {
+            console.log("4. Bouton cliqué ! Vérification...");
+            const u = document.getElementById('loginUser').value.trim();
+            const p = document.getElementById('loginPass').value.trim();
+            
+            console.log("Tentative avec :", u, p);
+            console.log("Liste utilisateurs connus :", globalUsers);
 
-// 1. Connexion -> Dashboard
-document.getElementById('btnLogin').addEventListener('click', () => {
-    const u = document.getElementById('loginUser').value.trim();
-    const p = document.getElementById('loginPass').value.trim();
-    const found = globalUsers.find(user => user.name.toLowerCase() === u.toLowerCase() && user.pass === p);
-    
-    if(found) {
-        currentUser = found;
-        document.getElementById('login-screen').classList.add('hidden');
-        document.getElementById('dashboard-screen').classList.remove('hidden');
-        document.getElementById('dashboard-screen').classList.add('fade-in');
-        
-        // Phrase de bienvenue : "Bienvenue Maître [NomDeFamille]"
-        const lastName = currentUser.name.split(' ').pop();
-        document.getElementById('welcomeTitle').innerText = `Bienvenue Maître ${lastName}`;
+            const found = globalUsers.find(user => user.name.toLowerCase() === u.toLowerCase() && user.pass === p);
+            
+            if(found) {
+                console.log("5. Utilisateur trouvé ! Connexion...");
+                currentUser = found;
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('dashboard-screen').classList.remove('hidden');
+                document.getElementById('dashboard-screen').classList.add('fade-in');
+                const lastName = currentUser.name.split(' ').pop();
+                document.getElementById('welcomeTitle').innerText = `Bienvenue Maître ${lastName}`;
+            } else {
+                console.warn("Utilisateur inconnu ou mauvais mot de passe");
+                document.getElementById('loginError').classList.remove('hidden');
+                // Animation vibration
+                const box = document.getElementById('login-screen');
+                box.style.animation = 'none'; box.offsetHeight; box.style.animation = 'shake 0.3s';
+            }
+        });
     } else {
-        document.getElementById('loginError').classList.remove('hidden');
+        console.error("ERREUR CRITIQUE : Le bouton 'btnLogin' est introuvable dans le HTML.");
     }
-});
+};
 
-// 2. Dashboard -> App (Commis)
+// --- NAVIGATION & FONCTIONS GLOBALES ---
 window.ouvrirApp = (module) => {
     if(module === 'commis') {
         document.getElementById('dashboard-screen').classList.add('hidden');
@@ -477,25 +504,20 @@ window.ouvrirApp = (module) => {
     }
 };
 
-// 3. App -> Dashboard
 window.retourDashboard = () => {
     document.getElementById('app-screen').classList.add('hidden');
     document.getElementById('dashboard-screen').classList.remove('hidden');
     document.body.style.alignItems = 'center';
 };
 
-// --- LOGIQUE APP COMMIS ---
 function lancerAppCommis() {
     document.getElementById('app-screen').classList.remove('hidden');
     document.getElementById('app-screen').classList.add('fade-in');
-    document.body.style.alignItems = 'flex-start'; // Aligner en haut pour le tableau
-
-    // Infos user
+    document.body.style.alignItems = 'flex-start';
     document.getElementById('displayUser').innerText = currentUser.name;
     document.getElementById('roleBadge').innerText = currentUser.role.toUpperCase();
     document.getElementById('displayGrade').value = `${currentUser.role} (${currentUser.grade * 100}%)`;
-
-    // Admin check
+    
     const nom = currentUser.name.toLowerCase();
     if(nom.includes('dawson') || nom.includes('mariani')) {
         document.getElementById('adminPanel').classList.remove('hidden');
@@ -504,34 +526,56 @@ function lancerAppCommis() {
     window.renderTable();
 }
 
-// --- FONCTIONS FIREBASE & ADMIN ---
+// --- ADMIN & LOGIQUE ---
+// (J'ai mis ces écouteurs dans un bloc sécurisé pour éviter les erreurs si les éléments n'existent pas encore)
+setTimeout(() => {
+    const btnCreate = document.getElementById('btnCreateUser');
+    if(btnCreate) btnCreate.addEventListener('click', async () => {
+        const name = document.getElementById('newUserName').value;
+        const pass = document.getElementById('newUserPass').value;
+        const grade = parseFloat(document.getElementById('newUserGrade').value);
+        const sel = document.getElementById('newUserGrade');
+        const role = sel.options[sel.selectedIndex].text.split('(')[0].trim();
+        if(!name || !pass) return alert("Remplir tout");
+        try {
+            await addDoc(collection(db, "users"), { name, pass, grade, role });
+            alert("Utilisateur créé !");
+            document.getElementById('newUserName').value = "";
+        } catch(e) { alert("Erreur: " + e.message); }
+    });
 
-document.getElementById('btnCreateUser').addEventListener('click', async () => {
-    const name = document.getElementById('newUserName').value;
-    const pass = document.getElementById('newUserPass').value;
-    const grade = parseFloat(document.getElementById('newUserGrade').value);
-    const sel = document.getElementById('newUserGrade');
-    const role = sel.options[sel.selectedIndex].text.split('(')[0].trim();
-    if(!name || !pass) return alert("Remplir tout");
-    try {
-        await addDoc(collection(db, "users"), { name, pass, grade, role });
-        alert("Utilisateur créé !");
-        document.getElementById('newUserName').value = "";
-    } catch(e) { alert("Erreur: " + e.message); }
-});
+    const btnEdit = document.getElementById('btnEditUser');
+    if(btnEdit) btnEdit.addEventListener('click', async () => {
+        const userId = document.getElementById('editUserSelect').value;
+        const newGrade = parseFloat(document.getElementById('editUserGrade').value);
+        const sel = document.getElementById('editUserGrade');
+        const newRole = sel.options[sel.selectedIndex].text.split('(')[0].trim();
+        if(!userId) return;
+        try {
+            const userRef = doc(db, "users", userId);
+            await updateDoc(userRef, { grade: newGrade, role: newRole });
+            alert("Mis à jour !");
+        } catch(e) { alert("Erreur: " + e.message); }
+    });
 
-document.getElementById('btnEditUser').addEventListener('click', async () => {
-    const userId = document.getElementById('editUserSelect').value;
-    const newGrade = parseFloat(document.getElementById('editUserGrade').value);
-    const sel = document.getElementById('editUserGrade');
-    const newRole = sel.options[sel.selectedIndex].text.split('(')[0].trim();
-    if(!userId) return;
-    try {
-        const userRef = doc(db, "users", userId);
-        await updateDoc(userRef, { grade: newGrade, role: newRole });
-        alert("Mis à jour !");
-    } catch(e) { alert("Erreur: " + e.message); }
-});
+    const btnAdd = document.getElementById('btnAddCase');
+    if(btnAdd) btnAdd.addEventListener('click', async () => {
+        const client = document.getElementById('client').value;
+        const charges = document.getElementById('charges').value;
+        const amende = parseFloat(document.getElementById('amende').value) || 0;
+        const proces = document.getElementById('proces').checked;
+        const accord = document.getElementById('accord').checked;
+        if(!client) return alert("Client requis");
+        const maPart = PRIX_COMMIS * currentUser.grade;
+        try {
+            await addDoc(collection(db, "dossiers"), {
+                timestamp: Date.now(), auteur: currentUser.name, client, charges, amende, proces, accord, factureEtat: PRIX_COMMIS, gainAvocat: maPart
+            });
+            document.getElementById('client').value = ""; document.getElementById('charges').value = ""; document.getElementById('amende').value = "";
+            document.getElementById('proces').checked = false; document.getElementById('accord').checked = false;
+        } catch(e) { alert("Erreur: " + e.message); }
+    });
+}, 1000);
 
 function chargerSelectEmployes() {
     const sel = document.getElementById('editUserSelect');
@@ -543,23 +587,6 @@ function chargerSelectEmployes() {
         sel.appendChild(opt);
     });
 }
-
-document.getElementById('btnAddCase').addEventListener('click', async () => {
-    const client = document.getElementById('client').value;
-    const charges = document.getElementById('charges').value;
-    const amende = parseFloat(document.getElementById('amende').value) || 0;
-    const proces = document.getElementById('proces').checked;
-    const accord = document.getElementById('accord').checked;
-    if(!client) return alert("Client requis");
-    const maPart = PRIX_COMMIS * currentUser.grade;
-    try {
-        await addDoc(collection(db, "dossiers"), {
-            timestamp: Date.now(), auteur: currentUser.name, client, charges, amende, proces, accord, factureEtat: PRIX_COMMIS, gainAvocat: maPart
-        });
-        document.getElementById('client').value = ""; document.getElementById('charges').value = ""; document.getElementById('amende').value = "";
-        document.getElementById('proces').checked = false; document.getElementById('accord').checked = false;
-    } catch(e) { alert("Erreur: " + e.message); }
-});
 
 window.supprimerDossier = async (id, auteur) => {
     const nom = currentUser.name.toLowerCase();
