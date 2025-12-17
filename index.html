@@ -10,131 +10,76 @@
 
     <style>
         
-        /* RESET & FONTS */
-:root { 
-    --bg-dark: #0f0f13; 
-    --panel-bg: rgba(30, 30, 35, 0.95); 
-    --gold: #d4af37; 
-    --text-main: #fff; 
-    --font-main: 'Segoe UI', system-ui, sans-serif; 
-}
-
-* { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
-
-body { 
-    background: radial-gradient(circle at top right, #1a1a20 0%, #0f0f13 100%); 
-    color: var(--text-main); 
-    font-family: var(--font-main); 
-    min-height: 100vh; 
-    display: flex; 
-    justify-content: center; 
-    align-items: center; 
-    overflow-x: hidden; 
-}
-
+      :root { --bg-dark: #0f0f13; --panel-bg: rgba(30, 30, 35, 0.95); --gold: #d4af37; --text-main: #fff; --font-main: 'Segoe UI', system-ui, sans-serif; }
+* { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
+body { background: radial-gradient(circle at top right, #1a1a20 0%, #0f0f13 100%); color: var(--text-main); font-family: var(--font-main); min-height: 100vh; display: flex; justify-content: center; align-items: center; overflow-x: hidden; }
 .hidden { display: none !important; }
-.fade-in { animation: fadeIn 0.5s ease forwards; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.glass-panel { background: var(--panel-bg); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
 
-/* PANNEAUX & STYLE */
-.glass-panel { 
-    background: var(--panel-bg); 
-    backdrop-filter: blur(12px); 
-    border: 1px solid rgba(255,255,255,0.08); 
-    border-radius: 16px; 
-    box-shadow: 0 8px 32px rgba(0,0,0,0.4); 
-}
-
-/* LOGIN */
 #login-screen { width: 90%; max-width: 420px; padding: 40px; text-align: center; border-top: 4px solid var(--gold); }
-
-/* INPUTS */
 .input-group { margin-bottom: 15px; text-align: left; }
 label { display: block; color: #a0a0a0; font-size: 0.75rem; margin-bottom: 6px; text-transform: uppercase; font-weight: 600; }
-input, select { 
-    width: 100%; padding: 12px; 
-    background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); 
-    border-radius: 8px; color: #fff; font-size: 1rem; 
-}
+input, select { width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; font-size: 1rem; }
+.btn-primary { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--gold), #b38f26); color: #000; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
 
-/* BOUTONS */
-.btn-primary { 
-    width: 100%; padding: 14px; 
-    background: linear-gradient(135deg, var(--gold), #b38f26); 
-    color: #000; font-weight: bold; border: none; 
-    border-radius: 8px; cursor: pointer; text-transform: uppercase; margin-top: 10px; 
-}
-.btn-primary:hover { transform: translateY(-2px); }
-
-.btn-pdf { 
-    background: #fff; color: #000; padding: 8px 15px; 
-    border-radius: 6px; cursor: pointer; font-weight: bold; border: none; 
-}
-
-/* LAYOUT APP */
 #app-screen { width: 100%; max-width: 1400px; padding: 20px; }
 .navbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; margin-bottom: 25px; }
-
 .admin-section { padding: 25px; margin-bottom: 25px; border: 1px solid var(--gold); background: rgba(212, 175, 55, 0.05); }
-
-/* STATS GRID */
 .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
 .stat-card { padding: 20px; text-align: center; border-bottom: 3px solid transparent; }
 .stat-card.highlight-gold { border-bottom-color: var(--gold); }
 .money { font-family: monospace; font-size: 1.5rem; color: var(--gold); margin-top: 5px; }
 
-/* FORM GRID */
+/* GRILLE ET BOUTONS SWITCH */
 .form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 15px; align-items: end; }
+.toggles-wrapper { display: flex; gap: 20px; height: 48px; align-items: center; }
+.toggle-control { display: flex; align-items: center; cursor: pointer; }
+.toggle-control input { display: none; }
+.toggle-control .control { width: 40px; height: 22px; background: rgba(255,255,255,0.1); border-radius: 20px; position: relative; margin-right: 10px; transition: 0.3s; }
+.toggle-control .control::after { content:''; position: absolute; left: 2px; top: 2px; width: 18px; height: 18px; background: #fff; border-radius: 50%; transition: 0.3s; }
+.toggle-control input:checked + .control { background: var(--gold); }
+.toggle-control input:checked + .control::after { transform: translateX(18px); }
+.toggle-control .label { font-size: 0.9rem; color: #ccc; }
 
-/* TABLEAU */
+/* TABLEAU ET RECHERCHE */
+.table-header { display: flex; justify-content: space-between; align-items: center; padding: 20px; flex-wrap: wrap; gap: 10px; }
+.search-box input { padding: 8px 12px; border-radius: 20px; border: 1px solid #444; background: #222; color: #fff; width: 200px; }
 .table-responsive { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; min-width: 800px; }
 th { text-align: left; padding: 15px; color: #a0a0a0; font-size: 0.7rem; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.1); }
 td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.btn-pdf { background: #fff; color: #000; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; border: none; }
 
-/* MOBILE */
-@media (max-width: 900px) { 
-    .form-grid { grid-template-columns: 1fr; } 
-    .navbar { flex-direction: column; align-items: flex-start; gap: 10px; } 
-}
+@media (max-width: 900px) { .form-grid { grid-template-columns: 1fr; } .navbar { flex-direction: column; align-items: flex-start; gap: 10px; } }
+
 
     </style>
 </head>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
-<div id="login-screen" class="glass-panel fade-in">
-    <h2 style="color:#d4af37; margin-bottom:5px;">DAWSON & PARTNERS</h2>
+<div id="login-screen" class="glass-panel">
+    <h2 style="color:#d4af37;">DAWSON & PARTNERS</h2>
     <p style="color:#888; margin-bottom:30px;">Intranet Cloud</p>
-    
-    <div class="input-group">
-        <label>Nom de famille</label>
-        <input type="text" id="loginUser" placeholder="Ex: James Dawson">
-    </div>
-    <div class="input-group">
-        <label>Mot de passe</label>
-        <input type="password" id="loginPass" placeholder="••••••">
-    </div>
-    
+    <div class="input-group"><label>Identifiant</label><input type="text" id="loginUser" placeholder="James Dawson"></div>
+    <div class="input-group"><label>Mot de passe</label><input type="password" id="loginPass" placeholder="••••••"></div>
     <button class="btn-primary" id="btnLogin">Connexion</button>
-    <p id="loginError" class="hidden" style="color:#ff4d4d; margin-top:10px;">⛔ Accès refusé</p>
+    <p id="loginError" class="hidden" style="color:#ff4d4d; margin-top:10px;">⛔ Identifiants incorrects</p>
 </div>
 
 <div id="app-screen" class="hidden">
     <nav class="navbar glass-panel">
-        <div>
-            <h1 style="color:#d4af37; font-size:1.2rem; margin:0;">DAWSON & PARTNERS</h1>
-            <span id="roleBadge" style="font-size:0.8rem; color:#fff; font-weight:bold;">...</span>
-        </div>
+        <div><h1 style="color:#d4af37; font-size:1.2rem;">DAWSON & PARTNERS</h1><span id="roleBadge" style="font-size:0.8rem; color:#fff;">...</span></div>
         <button id="btnLogout" style="background:none; border:1px solid #444; color:#fff; padding:8px 12px; border-radius:4px; cursor:pointer;">Déconnexion</button>
     </nav>
 
     <div id="adminPanel" class="admin-section glass-panel hidden">
-        <h3 style="color:#d4af37; margin-bottom:15px;">👑 Gestion RH (Admin)</h3>
-        <div class="form-grid">
-            <div class="input-group"><label>Nom Complet</label><input type="text" id="newUserName"></div>
+        <h3 style="color:#d4af37;">👑 Gestion RH</h3>
+        
+        <div class="form-grid" style="margin-top:15px; margin-bottom:20px;">
+            <div class="input-group"><label>Nouveau Nom</label><input type="text" id="newUserName"></div>
             <div class="input-group"><label>Mot de passe</label><input type="text" id="newUserPass"></div>
-            <div class="input-group"><label>Grade</label>
+            <div class="input-group"><label>Grade Initial</label>
                 <select id="newUserGrade">
                     <option value="0.75">Président (75%)</option>
                     <option value="0.65">Partenaire Directeur (65%)</option>
@@ -148,60 +93,65 @@ td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
                     <option value="0">Assistant Juridique (0%)</option>
                 </select>
             </div>
-            <button class="btn-primary" id="btnCreateUser">Créer Compte</button>
+            <button class="btn-primary" id="btnCreateUser">Créer</button>
+        </div>
+        
+        <hr style="border:0; border-top:1px solid #d4af37; opacity:0.3; margin:20px 0;">
+
+        <h3 style="color:#d4af37; font-size:1rem;">✏️ Modifier le Grade d'un employé</h3>
+        <div class="form-grid" style="margin-top:15px;">
+            <div class="input-group" style="grid-column: span 2;"><label>Choisir l'Employé</label><select id="editUserSelect"><option>Chargement...</option></select></div>
+            <div class="input-group"><label>Nouveau Grade</label>
+                <select id="editUserGrade">
+                    <option value="0.75">Président (75%)</option>
+                    <option value="0.65">Partenaire Directeur (65%)</option>
+                    <option value="0.60">Partenaire Sénior (60%)</option>
+                    <option value="0.55">Partenaire (55%)</option>
+                    <option value="0.50">Partenaire Junior (50%)</option>
+                    <option value="0.40">Avocat Sénior (40%)</option>
+                    <option value="0.35">Avocat (35%)</option>
+                    <option value="0.30">Avocat Junior (30%)</option>
+                    <option value="0">Parajuriste (0%)</option>
+                    <option value="0">Assistant Juridique (0%)</option>
+                </select>
+            </div>
+            <button class="btn-primary" id="btnEditUser">Mettre à jour</button>
         </div>
     </div>
 
     <div class="stats-row">
-        <div class="stat-card glass-panel">
-            <span>Total Cabinet</span>
-            <h3 id="totalEtat" class="money">0 $</h3>
-        </div>
-        <div class="stat-card glass-panel highlight-gold">
-            <span>Vos Commissions</span>
-            <h3 id="totalGain" class="money" style="color:#00e676">0 $</h3>
-        </div>
-        <div class="stat-card glass-panel">
-            <span>Amendes</span>
-            <h3 id="totalAmendes" class="money">0 $</h3>
-        </div>
+        <div class="stat-card glass-panel"><span>Total Cabinet</span><h3 id="totalEtat" class="money">0 $</h3></div>
+        <div class="stat-card glass-panel highlight-gold"><span>Vos Commissions</span><h3 id="totalGain" class="money" style="color:#00e676">0 $</h3></div>
+        <div class="stat-card glass-panel"><span>Amendes</span><h3 id="totalAmendes" class="money">0 $</h3></div>
     </div>
 
     <div class="glass-panel" style="padding:25px; margin-bottom:25px;">
-        <h3 style="color:#d4af37; margin-bottom:20px;">Nouveau Dossier Commis (+150k)</h3>
+        <h3 style="color:#d4af37; margin-bottom:20px;">Nouveau Dossier (+150k)</h3>
         <div class="form-grid">
             <div class="input-group"><label>Client</label><input type="text" id="client"></div>
             <div class="input-group"><label>Charges</label><input type="text" id="charges"></div>
-            <div class="input-group"><label>Amende ($)</label><input type="number" id="amende"></div>
+            <div class="input-group"><label>Amende</label><input type="number" id="amende"></div>
             
-            <div style="display:flex; gap:15px; align-items:center;">
-                <label style="color:#fff; cursor:pointer;"><input type="checkbox" id="proces"> Procès</label>
-                <label style="color:#fff; cursor:pointer;"><input type="checkbox" id="accord"> Accord</label>
+            <div class="toggles-wrapper">
+                <label class="toggle-control"><input type="checkbox" id="proces"><span class="control"></span><span class="label">Procès</span></label>
+                <label class="toggle-control"><input type="checkbox" id="accord"><span class="control"></span><span class="label">Accord</span></label>
             </div>
             
-            <button class="btn-primary" id="btnAddCase" style="grid-column:1/-1">Enregistrer le Dossier</button>
+            <button class="btn-primary" id="btnAddCase" style="grid-column:1/-1">Enregistrer</button>
         </div>
     </div>
 
     <div class="glass-panel" style="padding:0;">
-        <div style="padding:20px; display:flex; justify-content:space-between; align-items:center;">
+        <div class="table-header">
             <h3>Historique</h3>
-            <button class="btn-pdf" onclick="exporterPDF()">📄 Télécharger PDF</button>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <div class="search-box"><input type="text" id="search" placeholder="Rechercher..." onkeyup="window.renderTable()"></div>
+                <button class="btn-pdf" onclick="exporterPDF()">📄 PDF</button>
+            </div>
         </div>
         <div class="table-responsive">
             <table>
-                <thead>
-                    <tr>
-                        <th>Avocat</th>
-                        <th>Client</th>
-                        <th>Charges</th>
-                        <th>Amende</th>
-                        <th>Procès</th>
-                        <th>Accord</th>
-                        <th>Com</th>
-                        <th></th>
-                    </tr>
-                </thead>
+                <thead><tr><th>Avocat</th><th>Client</th><th>Charges</th><th>Amende</th><th>Procès</th><th>Accord</th><th>Com</th><th></th></tr></thead>
                 <tbody id="listeDossiers"></tbody>
             </table>
         </div>
@@ -211,9 +161,8 @@ td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
 
     <script type="module">
 
-     // IMPORTATION DES MODULES FIREBASE (OBLIGATOIRE POUR LE CLOUD)
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc, onSnapshot, query, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
@@ -226,203 +175,148 @@ const firebaseConfig = {
   measurementId: "G-QJPKCGYCBT"
 };
 
-// INITIALISATION
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const PRIX_COMMIS = 150000;
-
 let currentUser = null;
 let globalUsers = [];
 let globalDossiers = [];
 
-// 1. ÉCOUTE EN TEMPS RÉEL : UTILISATEURS
-onSnapshot(collection(db, "users"), (snap) => {
+// ECOUTE UTILISATEURS
+onSnapshot(collection(db, "users"), (s) => {
     globalUsers = [];
-    snap.forEach(d => globalUsers.push({id: d.id, ...d.data()}));
+    s.forEach(d => globalUsers.push({id: d.id, ...d.data()}));
+    chargerSelectEdit(); // Met à jour la liste déroulante admin
 });
 
-// 2. ÉCOUTE EN TEMPS RÉEL : DOSSIERS
-onSnapshot(query(collection(db, "dossiers")), (snap) => {
+// ECOUTE DOSSIERS
+onSnapshot(query(collection(db, "dossiers")), (s) => {
     globalDossiers = [];
-    snap.forEach(d => globalDossiers.push({id: d.id, ...d.data()}));
-    // Si connecté, mettre à jour le tableau en direct
+    s.forEach(d => globalDossiers.push({id: d.id, ...d.data()}));
     if(currentUser) renderTable();
 });
 
-// --- GESTION DE LA CONNEXION ---
+// CONNEXION
 document.getElementById('btnLogin').addEventListener('click', () => {
     const u = document.getElementById('loginUser').value.trim();
     const p = document.getElementById('loginPass').value.trim();
-    
-    // Vérification dans la liste chargée depuis le Cloud
     const found = globalUsers.find(user => user.name.toLowerCase() === u.toLowerCase() && user.pass === p);
-    
     if(found) {
         currentUser = found;
-        lancerApplication();
+        document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('app-screen').classList.remove('hidden');
+        document.getElementById('roleBadge').innerText = currentUser.role.toUpperCase();
+        
+        // Afficher admin si Dawson ou Mariani
+        if(currentUser.name.toLowerCase().includes('dawson') || currentUser.name.toLowerCase().includes('mariani')) {
+            document.getElementById('adminPanel').classList.remove('hidden');
+        }
+        renderTable();
     } else {
         document.getElementById('loginError').classList.remove('hidden');
     }
 });
 
-document.getElementById('btnLogout').addEventListener('click', () => {
-    location.reload(); // Recharge la page pour déconnecter
-});
-
-function lancerApplication() {
-    document.getElementById('login-screen').classList.add('hidden');
-    document.getElementById('app-screen').classList.remove('hidden');
-    
-    // Mettre à jour les infos du haut
-    document.getElementById('roleBadge').innerText = currentUser.role;
-
-    // Afficher panneau admin si c'est Dawson ou Mariani
-    const nom = currentUser.name.toLowerCase();
-    if(nom.includes('dawson') || nom.includes('mariani')) {
-        document.getElementById('adminPanel').classList.remove('hidden');
-    }
-    
-    renderTable();
-}
-
-// --- AJOUTER UN DOSSIER ---
+// AJOUT DOSSIER
 document.getElementById('btnAddCase').addEventListener('click', async () => {
     const client = document.getElementById('client').value;
-    if(!client) return alert("Nom du client obligatoire !");
-
-    const charges = document.getElementById('charges').value;
-    const amende = parseFloat(document.getElementById('amende').value) || 0;
-    const proces = document.getElementById('proces').checked;
-    const accord = document.getElementById('accord').checked;
+    if(!client) return alert("Nom du client requis");
     
-    const gain = PRIX_COMMIS * currentUser.grade;
-
-    // ENVOI VERS FIREBASE (CLOUD)
-    try {
-        await addDoc(collection(db, "dossiers"), {
-            timestamp: Date.now(),
-            auteur: currentUser.name,
-            client: client,
-            charges: charges,
-            amende: amende,
-            proces: proces,
-            accord: accord,
-            factureEtat: PRIX_COMMIS,
-            gainAvocat: gain
-        });
-
-        // Vider les champs
-        document.getElementById('client').value = "";
-        document.getElementById('charges').value = "";
-        document.getElementById('amende').value = "";
-        document.getElementById('proces').checked = false;
-        document.getElementById('accord').checked = false;
-        
-    } catch(e) {
-        alert("Erreur d'envoi : " + e.message);
-    }
+    await addDoc(collection(db, "dossiers"), {
+        timestamp: Date.now(), 
+        auteur: currentUser.name,
+        client, 
+        charges: document.getElementById('charges').value,
+        amende: parseFloat(document.getElementById('amende').value)||0,
+        proces: document.getElementById('proces').checked,
+        accord: document.getElementById('accord').checked,
+        gainAvocat: 150000 * currentUser.grade, 
+        factureEtat: 150000
+    });
+    document.getElementById('client').value = "";
+    document.getElementById('charges').value = "";
+    document.getElementById('amende').value = "";
 });
 
-// --- AFFICHAGE DU TABLEAU ---
-function renderTable() {
+// AFFICHAGE TABLEAU (Avec Filtre Recherche)
+window.renderTable = () => {
     const tbody = document.getElementById('listeDossiers');
+    const search = document.getElementById('search').value.toLowerCase();
     tbody.innerHTML = "";
+    let tE=0, tG=0, tA=0;
     
-    let totalEtat = 0;
-    let totalGain = 0;
-    let totalAmendes = 0;
-    
-    // Tri par date (plus récent en haut)
-    const listeTriee = [...globalDossiers].sort((a,b) => b.timestamp - a.timestamp);
+    let list = globalDossiers.sort((a,b) => b.timestamp - a.timestamp);
+    if(search) list = list.filter(d => d.client.toLowerCase().includes(search)); // Filtre
 
-    listeTriee.forEach(d => {
-        totalEtat += d.factureEtat;
-        totalAmendes += d.amende;
-        if(d.auteur === currentUser.name) totalGain += d.gainAvocat;
-
+    list.forEach(d => {
+        tE += d.factureEtat; tA += d.amende;
+        if(d.auteur === currentUser.name) tG += d.gainAvocat;
+        
         const isMe = d.auteur === currentUser.name;
         const isAdmin = currentUser.name.toLowerCase().includes('dawson') || currentUser.name.toLowerCase().includes('mariani');
+        const del = (isMe || isAdmin) ? `<button onclick="window.del('${d.id}')" style="color:#ff4d4d;border:none;background:none;cursor:pointer;">×</button>` : '';
         
-        // Bouton supprimer visible seulement si c'est moi ou le patron
-        const delBtn = (isMe || isAdmin) ? 
-            `<button onclick="window.suppr('${d.id}')" style="color:#ff4d4d; border:none; background:none; cursor:pointer; font-size:1.2rem;">×</button>` : '';
-        
-        const styleMoi = isMe ? 'color:#fff; font-weight:bold;' : 'color:#888;';
-
-        const row = `
-            <tr>
-                <td style="${styleMoi}">${d.auteur}</td>
-                <td style="color:#d4af37; font-weight:600;">${d.client}</td>
-                <td style="color:#aaa; font-size:0.9rem;">${d.charges}</td>
-                <td style="font-family:monospace;">${d.amende} $</td>
-                <td>${d.proces ? '✅' : '❌'}</td>
-                <td>${d.accord ? '✅' : '❌'}</td>
-                <td style="color:#00e676; font-weight:bold;">${isMe ? '+ '+d.gainAvocat+' $' : ''}</td>
-                <td style="text-align:center;">${delBtn}</td>
-            </tr>
-        `;
-        tbody.innerHTML += row;
+        tbody.innerHTML += `<tr>
+            <td style="${isMe?'color:#fff;font-weight:bold':''}">${d.auteur}</td>
+            <td style="color:#d4af37">${d.client}</td>
+            <td style="color:#aaa;font-size:0.9em">${d.charges}</td>
+            <td>${d.amende}$</td>
+            <td>${d.proces?'✅':'❌'}</td>
+            <td>${d.accord?'✅':'❌'}</td>
+            <td style="color:#00e676">${isMe?'+'+d.gainAvocat+'$':''}</td>
+            <td>${del}</td>
+        </tr>`;
     });
-
-    // Mettre à jour les totaux en haut
-    document.getElementById('totalEtat').innerText = totalEtat.toLocaleString() + " $";
-    document.getElementById('totalGain').innerText = totalGain.toLocaleString() + " $";
-    document.getElementById('totalAmendes').innerText = totalAmendes.toLocaleString() + " $";
-}
-
-// --- FONCTION SUPPRESSION (CLOUD) ---
-// On l'attache à window pour qu'elle soit accessible depuis le HTML
-window.suppr = async (id) => {
-    if(confirm("Confirmer la suppression définitive ?")) {
-        await deleteDoc(doc(db, "dossiers", id));
-    }
+    document.getElementById('totalEtat').innerText = tE + " $";
+    document.getElementById('totalGain').innerText = tG + " $";
+    document.getElementById('totalAmendes').innerText = tA + " $";
 };
 
-// --- CRÉATION UTILISATEUR (ADMIN) ---
-document.getElementById('btnCreateUser').addEventListener('click', async () => {
-    const name = document.getElementById('newUserName').value;
-    const pass = document.getElementById('newUserPass').value;
-    const grade = parseFloat(document.getElementById('newUserGrade').value);
-    
-    // Récupérer le texte du rôle (ex: "Avocat")
-    const sel = document.getElementById('newUserGrade');
-    const role = sel.options[sel.selectedIndex].text.split('(')[0].trim();
+// --- FONCTIONS ADMIN ---
 
-    if(!name || !pass) return alert("Remplissez tout !");
-
-    await addDoc(collection(db, "users"), {
-        name: name,
-        pass: pass,
-        grade: grade,
-        role: role
+// Charger la liste des employés dans le menu déroulant
+function chargerSelectEdit() {
+    const s = document.getElementById('editUserSelect');
+    s.innerHTML = "<option>Choisir...</option>";
+    globalUsers.sort((a,b) => a.name.localeCompare(b.name)).forEach(u => {
+        const opt = document.createElement('option');
+        opt.value = u.id; opt.innerText = `${u.name} (${u.role})`;
+        s.appendChild(opt);
     });
-    
-    alert("Utilisateur créé avec succès !");
-    document.getElementById('newUserName').value = "";
-    document.getElementById('newUserPass').value = "";
+}
+
+// Créer Utilisateur
+document.getElementById('btnCreateUser').addEventListener('click', async () => {
+    const sel = document.getElementById('newUserGrade');
+    await addDoc(collection(db, "users"), {
+        name: document.getElementById('newUserName').value,
+        pass: document.getElementById('newUserPass').value,
+        grade: parseFloat(sel.value),
+        role: sel.options[sel.selectedIndex].text.split('(')[0].trim()
+    });
+    alert("Utilisateur créé !");
 });
 
-// --- EXPORT PDF ---
+// Modifier Grade
+document.getElementById('btnEditUser').addEventListener('click', async () => {
+    const id = document.getElementById('editUserSelect').value;
+    const sel = document.getElementById('editUserGrade');
+    if(!id || id==="Choisir...") return;
+    
+    await updateDoc(doc(db, "users", id), {
+        grade: parseFloat(sel.value),
+        role: sel.options[sel.selectedIndex].text.split('(')[0].trim()
+    });
+    alert("Grade mis à jour !");
+});
+
+window.del = async (id) => { if(confirm("Supprimer ce dossier ?")) await deleteDoc(doc(db, "dossiers", id)); };
+
 window.exporterPDF = () => {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    
-    doc.text("RAPPORT CABINET DAWSON & PARTNERS", 14, 20);
-    doc.setFontSize(10);
-    doc.text("Généré par " + currentUser.name, 14, 26);
-    
-    const data = globalDossiers.map(d => [
-        d.auteur, d.client, d.charges, d.amende + " $", d.gainAvocat + " $"
-    ]);
-    
-    doc.autoTable({
-        startY: 35,
-        head: [['Avocat', 'Client', 'Charges', 'Amende', 'Com.']],
-        body: data,
-        theme: 'striped',
-        headStyles: { fillColor: [212, 175, 55] }
-    });
-    
+    doc.text("RAPPORT CABINET DAWSON", 14, 20);
+    const data = globalDossiers.map(d => [d.auteur, d.client, d.charges, d.amende+"$", d.gainAvocat+"$"]);
+    doc.autoTable({ startY: 30, head: [['Avocat', 'Client', 'Charges', 'Amende', 'Com']], body: data });
     doc.save("Rapport_Cabinet.pdf");
 };
 
