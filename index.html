@@ -2,59 +2,253 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MODE DIAGNOSTIC - Dawson</title>
-    <style>
-        body { background: #121212; color: white; font-family: monospace; padding: 20px; }
-        h1 { color: #d4af37; text-align: center; }
-        .box { max-width: 600px; margin: 0 auto; background: #1e1e1e; padding: 20px; border-radius: 10px; border: 1px solid #333; }
-        
-        /* Console de débogage visuelle */
-        #debug-console { 
-            background: #000; border: 2px solid #555; padding: 15px; 
-            margin-top: 20px; min-height: 200px; white-space: pre-wrap; font-size: 13px;
-        }
-        .log { color: #0f0; } /* Vert */
-        .warn { color: orange; } /* Orange */
-        .error { color: #ff4d4d; font-weight: bold; border-left: 4px solid red; padding-left: 10px; } /* Rouge */
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Intranet Dawson & Partners</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
-        input { width: 100%; padding: 10px; margin: 5px 0; background: #333; border: 1px solid #555; color: white; }
-        button { width: 100%; padding: 15px; background: #d4af37; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; }
+    <style>
+        /* --- DESIGN GLOBAL --- */
+        :root { --bg-dark: #0f0f13; --panel-bg: rgba(30, 30, 35, 0.95); --gold: #d4af37; --gold-glow: rgba(212, 175, 55, 0.4); --text-main: #ffffff; --text-muted: #a0a0a0; --danger: #ff4d4d; --success: #00e676; --font-main: 'Segoe UI', system-ui, sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--bg-dark); background-image: radial-gradient(circle at top right, #1a1a20 0%, #0f0f13 100%); color: var(--text-main); font-family: var(--font-main); min-height: 100vh; width: 100vw; display: flex; justify-content: center; align-items: center; overflow-x: hidden; }
+        .hidden { display: none !important; }
+        .fade-in { animation: fadeIn 0.5s ease forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .glass-panel { background: var(--panel-bg); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); }
+        
+        /* LOGIN */
+        #login-screen { width: 90%; max-width: 420px; padding: 40px; text-align: center; border-top: 4px solid var(--gold); }
+        .logo-icon { font-size: 3rem; margin-bottom: 10px; text-shadow: 0 0 20px var(--gold-glow); }
+        .error-msg { color: var(--danger); font-size: 0.9rem; margin: 10px 0; background: rgba(255, 77, 77, 0.1); padding: 5px; border-radius: 4px; }
+
+        /* DASHBOARD */
+        #dashboard-screen { width: 100%; max-width: 1200px; padding: 20px; text-align: center; }
+        .dashboard-header h1 { font-size: 2.5rem; color: var(--gold); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; }
+        .dashboard-header p { color: #ccc; font-size: 1.2rem; margin-bottom: 40px; }
+        .modules-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; justify-content: center; }
+        .module-card { padding: 40px 20px; text-align: center; cursor: pointer; transition: 0.3s; border-bottom: 4px solid transparent; position: relative; overflow: hidden; }
+        .module-card:hover { transform: translateY(-10px); border-bottom-color: var(--gold); background: rgba(255,255,255,0.05); }
+        .module-icon { font-size: 3.5rem; margin-bottom: 20px; display: block; }
+        .module-title { font-size: 1.4rem; font-weight: bold; color: #fff; text-transform: uppercase; }
+        .module-desc { font-size: 0.9rem; color: #888; margin-top: 10px; }
+        .module-disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
+
+        /* APP */
+        #app-screen { width: 100%; max-width: 1400px; padding: 20px; margin: 0 auto; }
+        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; margin-bottom: 25px; }
+        .nav-left { display: flex; gap: 15px; align-items: center; }
+        .nav-home-btn { background: rgba(255,255,255,0.1); border: none; color: var(--gold); font-size: 1.2rem; padding: 8px 12px; border-radius: 8px; cursor: pointer; transition: 0.3s; }
+        .nav-home-btn:hover { background: var(--gold); color: #000; }
+        .badge-role { background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; color: var(--gold); }
+        .nav-user { display: flex; align-items: center; gap: 15px; }
+        .btn-logout { background: rgba(255,77,77,0.1); border: 1px solid rgba(255,77,77,0.3); color: var(--danger); padding: 8px 15px; border-radius: 8px; cursor: pointer; }
+        .btn-logout:hover { background: var(--danger); color: #fff; }
+
+        /* ELEMENTS COMMUNS */
+        .admin-section { padding: 25px; margin-bottom: 25px; border: 1px solid var(--gold); background: rgba(212, 175, 55, 0.05); }
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .stat-card { padding: 20px; text-align: center; border-bottom: 3px solid transparent; }
+        .stat-card.highlight-gold { border-bottom-color: var(--gold); }
+        .stat-card h3 { font-size: 1.6rem; margin-top: 5px; color: #fff; }
+        .money.gain { color: var(--success); }
+        .form-section { padding: 25px; margin-bottom: 25px; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
+        .tag-price { background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-family: monospace; color: var(--gold); }
+        .input-group { margin-bottom: 15px; text-align: left; }
+        label { display: block; color: var(--text-muted); font-size: 0.75rem; margin-bottom: 6px; text-transform: uppercase; font-weight: 600; }
+        input, select { width: 100%; padding: 12px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: #fff; font-size: 1rem; }
+        input:focus, select:focus { border-color: var(--gold); box-shadow: 0 0 10px var(--gold-glow); }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 15px; align-items: end; }
+        .span-2 { grid-column: span 2; }
+        .span-full { grid-column: 1 / -1; margin-top: 10px; }
+        .btn-primary { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--gold), #b38f26); color: #000; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; text-transform: uppercase; }
+        .btn-primary:hover { transform: translateY(-2px); }
+        .btn-pdf { background: #fff; color: #000; font-weight: bold; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 5px; }
+        .btn-pdf:hover { background: #eee; transform: translateY(-2px); }
+        .toggles-wrapper { display: flex; gap: 20px; height: 48px; align-items: center; }
+        .toggle-control { display: flex; align-items: center; cursor: pointer; }
+        .toggle-control input { display: none; }
+        .toggle-control .control { width: 40px; height: 22px; background: rgba(255,255,255,0.1); border-radius: 20px; position: relative; margin-right: 10px; transition: 0.3s; }
+        .toggle-control .control::after { content:''; position: absolute; left: 2px; top: 2px; width: 18px; height: 18px; background: #fff; border-radius: 50%; transition: 0.3s; }
+        .toggle-control input:checked + .control { background: var(--gold); }
+        .toggle-control input:checked + .control::after { transform: translateX(18px); }
+        .toggle-control .label { font-size: 0.9rem; color: #ccc; }
+        .table-section { padding: 0; overflow: hidden; }
+        .table-header { padding: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .actions-header { display: flex; gap: 10px; align-items: center; }
+        .table-responsive { overflow-x: auto; width: 100%; }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        th { text-align: left; padding: 15px; color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; }
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+        .badge { padding: 4px 10px; border-radius: 50px; font-size: 0.7rem; font-weight: bold; }
+        .badge.yes { background: rgba(0, 230, 118, 0.15); color: var(--success); }
+        .badge.no { background: rgba(255, 77, 77, 0.15); color: var(--danger); }
+        .delete-btn { background: none; border: none; color: #666; cursor: pointer; padding: 5px; font-size: 1.1rem; }
+        .delete-btn:hover { color: var(--danger); }
+        @media (max-width: 900px) { .form-grid { grid-template-columns: 1fr; } .span-2 { grid-column: span 1; } .navbar { flex-direction: column; gap: 15px; align-items: flex-start; } .nav-brand, .nav-user { width: 100%; justify-content: space-between; } #app-screen { padding: 10px; } .table-header { flex-direction: column; align-items: stretch; } .actions-header { justify-content: space-between; } }
     </style>
 </head>
 <body>
 
-    <h1>MODE DIAGNOSTIC</h1>
-    
-    <div class="box">
-        <h3>Test de Connexion</h3>
-        <input type="text" id="testUser" placeholder="Identifiant (ex: paul mariani)">
-        <input type="password" id="testPass" placeholder="Mot de passe">
-        <button id="btnTest">TESTER LA CONNEXION</button>
+<div class="bg-animation"></div>
+
+<div id="login-screen" class="glass-panel fade-in">
+    <div class="login-header">
+        <div class="logo-icon">⚖️</div>
+        <h2>Dawson & Partners</h2>
+        <p>Connexion Intranet</p>
+    </div>
+    <div class="input-group">
+        <label>Identifiant</label>
+        <input type="text" id="loginUser" placeholder="Nom Prénom">
+    </div>
+    <div class="input-group">
+        <label>Mot de passe</label>
+        <input type="password" id="loginPass" placeholder="••••••">
+    </div>
+    <p id="loginError" class="error-msg hidden">⛔ Erreur connexion (Vérifie la console)</p>
+    <button class="btn-primary" id="btnLogin">Se Connecter</button>
+</div>
+
+<div id="dashboard-screen" class="hidden">
+    <div class="dashboard-header">
+        <div class="logo-icon">⚖️</div>
+        <h1 id="welcomeTitle">Bienvenue...</h1>
+        <p>Veuillez sélectionner une application</p>
     </div>
 
-    <div id="debug-console">Initialisation du système de diagnostic...<br></div>
+    <div class="modules-grid">
+        <div class="module-card glass-panel" onclick="window.ouvrirApp('commis')">
+            <span class="module-icon">💼</span>
+            <div class="module-title">Commis d'Office</div>
+            <div class="module-desc">Gestion des dossiers</div>
+        </div>
+        <div class="module-card glass-panel module-disabled">
+            <span class="module-icon">💸</span>
+            <div class="module-title">Facturation</div>
+            <div class="module-desc">Bientôt</div>
+        </div>
+        <div class="module-card glass-panel module-disabled">
+            <span class="module-icon">📖</span>
+            <div class="module-title">Annuaire</div>
+            <div class="module-desc">Bientôt</div>
+        </div>
+    </div>
+    <div style="margin-top: 50px;">
+        <button class="btn-logout" onclick="location.reload()">Déconnexion</button>
+    </div>
+</div>
 
-    <script type="module">
-        // Fonction pour écrire dans la console visuelle
-        function log(msg, type = 'log') {
-            const el = document.getElementById('debug-console');
-            el.innerHTML += `<div class="${type}">> ${msg}</div>`;
-        }
+<div id="app-screen" class="hidden">
+    <nav class="navbar glass-panel">
+        <div class="nav-left">
+            <button class="nav-home-btn" onclick="window.retourDashboard()" title="Retour au Menu">🏠</button>
+            <div class="nav-brand">
+                <span class="logo">⚖️</span>
+                <div class="brand-text">
+                    <h1>Gestion Commis</h1>
+                    <span id="roleBadge" class="badge-role">...</span>
+                </div>
+            </div>
+        </div>
+        <div class="nav-user">
+            <div class="user-details">
+                <span class="welcome-label">Utilisateur</span>
+                <span id="displayUser" class="user-name">...</span>
+            </div>
+        </div>
+    </nav>
 
-        // 1. Capturer les erreurs de syntaxe globales
-        window.onerror = function(message, source, lineno, colno, error) {
-            log(`ERREUR CRITIQUE (Syntaxe) :\n${message}\nLigne: ${lineno}`, 'error');
-        };
+    <div class="main-content">
+        <div id="adminPanel" class="admin-section glass-panel hidden">
+            <div class="section-header"><h3>👑 Créer un Profil</h3></div>
+            <div class="form-grid">
+                <div class="input-group"><label>Nom</label><input type="text" id="newUserName" placeholder="Prénom Nom"></div>
+                <div class="input-group"><label>Mdp</label><input type="text" id="newUserPass"></div>
+                <div class="input-group"><label>Grade</label>
+                    <select id="newUserGrade">
+                        <option value="0.75">Président (75%)</option>
+                        <option value="0.65">Partenaire Directeur (65%)</option>
+                        <option value="0.60">Partenaire Sénior (60%)</option>
+                        <option value="0.55">Partenaire (55%)</option>
+                        <option value="0.50">Partenaire Junior (50%)</option>
+                        <option value="0.40">Avocat Sénior (40%)</option>
+                        <option value="0.35" selected>Avocat (35%)</option>
+                        <option value="0.30">Avocat Junior (30%)</option>
+                        <option value="0">Parajuriste (0%)</option>
+                        <option value="0">Assistant Juridique (0%)</option>
+                    </select>
+                </div>
+                <button class="btn-primary" id="btnCreateUser">Créer</button>
+            </div>
+            <hr style="border:0; border-top:1px solid #d4af37; margin:20px 0;">
+             <div class="section-header"><h3>✏️ Modifier Grade</h3></div>
+            <div class="form-grid">
+                <div class="input-group span-2"><label>Employé</label><select id="editUserSelect"><option>Chargement...</option></select></div>
+                <div class="input-group"><label>Nouveau Grade</label><select id="editUserGrade">
+                        <option value="0.75">Président (75%)</option>
+                        <option value="0.65">Partenaire Directeur (65%)</option>
+                        <option value="0.60">Partenaire Sénior (60%)</option>
+                        <option value="0.55">Partenaire (55%)</option>
+                        <option value="0.50">Partenaire Junior (50%)</option>
+                        <option value="0.40">Avocat Sénior (40%)</option>
+                        <option value="0.35" selected>Avocat (35%)</option>
+                        <option value="0.30">Avocat Junior (30%)</option>
+                        <option value="0">Parajuriste (0%)</option>
+                        <option value="0">Assistant Juridique (0%)</option>
+                </select></div>
+                <button class="btn-primary" id="btnEditUser">Modifier</button>
+            </div>
+        </div>
 
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        <div class="stats-row">
+            <div class="stat-card glass-panel"><span>Total Cabinet</span><h3 id="totalEtat" class="money">0 $</h3></div>
+            <div class="stat-card glass-panel highlight-gold"><span id="labelTotalGain">Vos Commissions</span><h3 id="totalGain" class="money gain">0 $</h3></div>
+            <div class="stat-card glass-panel"><span>Amendes</span><h3 id="totalAmendes" class="money">0 $</h3></div>
+        </div>
 
-        try {
-            log("Modules Firebase importés avec succès.");
+        <div class="form-section glass-panel">
+            <div class="section-header"><h3>Nouveau Dossier (+150k)</h3></div>
+            <div class="form-grid">
+                <div class="input-group"><label>Client</label><input type="text" id="client"></div>
+                <div class="input-group span-2"><label>Charges</label><input type="text" id="charges"></div>
+                <div class="input-group"><label>Grade</label><input type="text" id="displayGrade" disabled style="opacity:0.6"></div>
+                <div class="input-group"><label>Amende</label><input type="number" id="amende"></div>
+                <div class="toggles-wrapper">
+                    <label class="toggle-control"><input type="checkbox" id="proces"><span class="control"></span><span class="label">Procès</span></label>
+                    <label class="toggle-control"><input type="checkbox" id="accord"><span class="control"></span><span class="label">Accord</span></label>
+                </div>
+                <button class="btn-primary span-full" id="btnAddCase">Enregistrer</button>
+            </div>
+        </div>
 
-           // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
+        <div class="table-section glass-panel">
+            <div class="table-header">
+                <h3>Historique</h3>
+                <div class="actions-header">
+                    <button class="btn-pdf" onclick="window.exporterPDF()">📄 PDF</button>
+                    <div class="search-box"><input type="text" id="search" placeholder="Recherche..." onkeyup="window.renderTable()"></div>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table>
+                    <thead><tr><th>Avocat</th><th>Client</th><th>Charges</th><th>Amende</th><th>Procès</th><th>Accord</th><th>Facture</th><th>Com</th><th></th></tr></thead>
+                    <tbody id="listeDossiers"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+   const firebaseConfig = {
   apiKey: "AIzaSyAFJWLubNJiWIys9yHmtY--9QtDZ4hsbY0",
   authDomain: "dawson-cabinet.firebaseapp.com",
   projectId: "dawson-cabinet",
@@ -64,56 +258,175 @@ const firebaseConfig = {
   measurementId: "G-QJPKCGYCBT"
 };
 
-            log("Configuration chargée. Connexion à Google...");
-            const app = initializeApp(firebaseConfig);
-            const db = getFirestore(app);
-            log("Firebase initialisé. Vérification de la base de données...");
+    let app, db;
+    try {
+        app = initializeApp(firebaseConfig);
+        db = getFirestore(app);
+        console.log("Firebase OK");
+    } catch(e) {
+        console.error("Erreur Config:", e);
+    }
 
-            // Test automatique : Lire la liste des utilisateurs
-            getDocs(collection(db, "users"))
-                .then((snapshot) => {
-                    if (snapshot.empty) {
-                        log("⚠️ ATTENTION : Connexion réussie mais la collection 'users' est VIDE !", 'warn');
-                        log("Conseil : Va sur Firebase > Firestore > Données et crée la collection 'users' avec un premier compte.", 'warn');
-                    } else {
-                        log(`✅ SUCCÈS : ${snapshot.size} utilisateurs trouvés dans la base.`, 'log');
-                        let usersList = [];
-                        snapshot.forEach(doc => {
-                            const u = doc.data();
-                            log(`   - Trouvé : "${u.name}" (Pass: "${u.pass}")`);
-                            usersList.push(u);
-                        });
+    const PRIX_COMMIS = 150000;
+    let currentUser = null;
+    let globalUsers = [];
+    let globalDossiers = [];
 
-                        // Activer le bouton de test
-                        document.getElementById('btnTest').addEventListener('click', () => {
-                            const inputU = document.getElementById('testUser').value.trim();
-                            const inputP = document.getElementById('testPass').value.trim();
-                            
-                            log(`Tentative de connexion avec : "${inputU}" / "${inputP}"...`);
-                            
-                            const found = usersList.find(user => user.name.toLowerCase() === inputU.toLowerCase() && user.pass === inputP);
-                            
-                            if (found) {
-                                log(`✅ VALIDÉ ! Connexion réussie pour ${found.name}.`, 'log');
-                                log("CONCLUSION : Ton code marche. Remets le code original en faisant attention aux clés.", 'log');
-                            } else {
-                                log(`❌ ÉCHEC : Aucun utilisateur ne correspond. Vérifie l'orthographe exacte dans la liste ci-dessus.`, 'error');
-                            }
-                        });
-                    }
-                })
-                .catch((error) => {
-                    log(`ERREUR BASE DE DONNÉES :\n${error.message}`, 'error');
-                    if(error.message.includes("permission-denied")) {
-                        log("CAUSE PROBABLE : Tes règles de sécurité bloquent l'accès. Mets ta base en mode TEST.", 'warn');
-                    }
-                });
+    // CHARGEMENT DONNÉES
+    if(db) {
+        onSnapshot(query(collection(db, "users")), (snapshot) => {
+            globalUsers = [];
+            snapshot.forEach((doc) => globalUsers.push({ id: doc.id, ...doc.data() }));
+            console.log("Users chargés:", globalUsers.length);
+        });
 
-        } catch (e) {
-            log(`ERREUR CONFIGURATION :\n${e.message}`, 'error');
-            log("Vérifie que tu as bien copié les clés sans oublier de virgule ou de guillemet.", 'warn');
+        onSnapshot(query(collection(db, "dossiers")), (snapshot) => {
+            globalDossiers = [];
+            snapshot.forEach((doc) => globalDossiers.push({ id: doc.id, ...doc.data() }));
+            if(currentUser) window.renderTable();
+        });
+    }
+
+    // CONNEXION
+    document.getElementById('btnLogin').addEventListener('click', () => {
+        const u = document.getElementById('loginUser').value.trim();
+        const p = document.getElementById('loginPass').value.trim();
+        
+        const found = globalUsers.find(user => user.name.toLowerCase() === u.toLowerCase() && user.pass === p);
+        
+        if(found) {
+            currentUser = found;
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('dashboard-screen').classList.remove('hidden');
+            document.getElementById('dashboard-screen').classList.add('fade-in');
+            const lastName = currentUser.name.split(' ').pop();
+            document.getElementById('welcomeTitle').innerText = `Bienvenue Maître ${lastName}`;
+        } else {
+            document.getElementById('loginError').classList.remove('hidden');
         }
-    </script>
+    });
+
+    // NAVIGATION
+    window.ouvrirApp = (module) => {
+        if(module === 'commis') {
+            document.getElementById('dashboard-screen').classList.add('hidden');
+            lancerAppCommis();
+        }
+    };
+
+    window.retourDashboard = () => {
+        document.getElementById('app-screen').classList.add('hidden');
+        document.getElementById('dashboard-screen').classList.remove('hidden');
+        document.body.style.alignItems = 'center';
+    };
+
+    function lancerAppCommis() {
+        document.getElementById('app-screen').classList.remove('hidden');
+        document.getElementById('app-screen').classList.add('fade-in');
+        document.body.style.alignItems = 'flex-start';
+        document.getElementById('displayUser').innerText = currentUser.name;
+        document.getElementById('roleBadge').innerText = currentUser.role.toUpperCase();
+        document.getElementById('displayGrade').value = `${currentUser.role} (${currentUser.grade * 100}%)`;
+        
+        const nom = currentUser.name.toLowerCase();
+        if(nom.includes('dawson') || nom.includes('mariani')) {
+            document.getElementById('adminPanel').classList.remove('hidden');
+            chargerSelectEmployes();
+        }
+        window.renderTable();
+    }
+
+    // LOGIQUE ADMIN & DOSSIERS
+    document.getElementById('btnCreateUser').addEventListener('click', async () => {
+        const name = document.getElementById('newUserName').value;
+        const pass = document.getElementById('newUserPass').value;
+        const grade = parseFloat(document.getElementById('newUserGrade').value);
+        const sel = document.getElementById('newUserGrade');
+        const role = sel.options[sel.selectedIndex].text.split('(')[0].trim();
+        if(name && pass) {
+            await addDoc(collection(db, "users"), { name, pass, grade, role });
+            alert("Compte créé !");
+        }
+    });
+
+    document.getElementById('btnEditUser').addEventListener('click', async () => {
+        const userId = document.getElementById('editUserSelect').value;
+        const newGrade = parseFloat(document.getElementById('editUserGrade').value);
+        const sel = document.getElementById('editUserGrade');
+        const newRole = sel.options[sel.selectedIndex].text.split('(')[0].trim();
+        if(userId) {
+            await updateDoc(doc(db, "users", userId), { grade: newGrade, role: newRole });
+            alert("Mis à jour !");
+        }
+    });
+
+    function chargerSelectEmployes() {
+        const sel = document.getElementById('editUserSelect');
+        sel.innerHTML = "";
+        globalUsers.sort((a,b) => a.name.localeCompare(b.name)).forEach(u => {
+            const opt = document.createElement('option');
+            opt.value = u.id;
+            opt.innerText = `${u.name} (${u.role})`;
+            sel.appendChild(opt);
+        });
+    }
+
+    document.getElementById('btnAddCase').addEventListener('click', async () => {
+        const client = document.getElementById('client').value;
+        const charges = document.getElementById('charges').value;
+        const amende = parseFloat(document.getElementById('amende').value) || 0;
+        const proces = document.getElementById('proces').checked;
+        const accord = document.getElementById('accord').checked;
+        if(client) {
+            const maPart = PRIX_COMMIS * currentUser.grade;
+            await addDoc(collection(db, "dossiers"), {
+                timestamp: Date.now(), auteur: currentUser.name, client, charges, amende, proces, accord, factureEtat: PRIX_COMMIS, gainAvocat: maPart
+            });
+            document.getElementById('client').value = "";
+        }
+    });
+
+    window.supprimerDossier = async (id, auteur) => {
+        const nom = currentUser.name.toLowerCase();
+        const isAdmin = nom.includes('dawson') || nom.includes('mariani');
+        if(currentUser.name === auteur || isAdmin) {
+            if(confirm("Supprimer ?")) await deleteDoc(doc(db, "dossiers", id));
+        } else { alert("Pas le droit !"); }
+    };
+
+    window.renderTable = () => {
+        const tbody = document.getElementById('listeDossiers');
+        const search = document.getElementById('search').value.toLowerCase();
+        tbody.innerHTML = "";
+        let sumEtat = 0, sumGain = 0, sumAmendes = 0;
+        let list = [...globalDossiers].sort((a,b) => b.timestamp - a.timestamp);
+        if(search) list = list.filter(d => d.client.toLowerCase().includes(search));
+        
+        list.forEach(d => {
+            sumEtat += d.factureEtat; sumAmendes += d.amende;
+            if(d.auteur === currentUser.name) sumGain += d.gainAvocat;
+            const isMe = d.auteur === currentUser.name;
+            const nom = currentUser.name.toLowerCase();
+            const isAdmin = nom.includes('dawson') || nom.includes('mariani');
+            const btnDel = (isMe || isAdmin) ? `<button class="delete-btn" onclick="supprimerDossier('${d.id}', '${d.auteur}')">×</button>` : '';
+            const styleUser = isMe ? "color:#fff; font-weight:bold" : "color:#888";
+            tbody.innerHTML += `<tr><td style="${styleUser}">${d.auteur}</td><td style="color:#d4af37; font-weight:600">${d.client}</td><td style="color:#aaa; font-size:0.9em">${d.charges}</td><td style="font-family:monospace">${formater(d.amende)}</td><td class="text-center">${d.proces ? '✅' : '❌'}</td><td class="text-center">${d.accord ? '✅' : '❌'}</td><td class="text-right" style="color:#aaa">${formater(d.factureEtat)}</td><td class="text-right" style="color:#00e676; font-weight:bold">${isMe ? '+ '+formater(d.gainAvocat) : '-'}</td><td class="text-center">${btnDel}</td></tr>`;
+        });
+        document.getElementById('totalEtat').innerText = formater(sumEtat);
+        document.getElementById('totalGain').innerText = formater(sumGain);
+        document.getElementById('totalAmendes').innerText = formater(sumAmendes);
+    };
+
+    function formater(n) { return new Intl.NumberFormat('en-US').format(n).replace(/,/g, ' ') + ' $'; }
+    window.exporterPDF = () => {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.text("RAPPORT CABINET DAWSON", 14, 20);
+        const data = globalDossiers.map(d => [d.auteur, d.client, d.charges, d.amende, d.proces?'O':'N', d.accord?'O':'N', d.factureEtat, d.gainAvocat]);
+        doc.autoTable({ startY: 30, head: [['Avocat', 'Client', 'Charges', 'Amende', 'P', 'A', 'Total', 'Com']], body: data });
+        doc.save("Rapport.pdf");
+    };
+</script>
 
 </body>
 </html>
