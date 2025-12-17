@@ -4,93 +4,478 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Intranet Dawson & Partners</title>
-    
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
     <style>
-        /* --- DESIGN GLOBAL --- */
-        :root { --bg-dark: #0f0f13; --panel-bg: rgba(30, 30, 35, 0.95); --gold: #d4af37; --gold-glow: rgba(212, 175, 55, 0.4); --text-main: #ffffff; --text-muted: #a0a0a0; --danger: #ff4d4d; --success: #00e676; --font-main: 'Segoe UI', system-ui, sans-serif; }
-        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg-dark); background-image: radial-gradient(circle at top right, #1a1a20 0%, #0f0f13 100%); color: var(--text-main); font-family: var(--font-main); min-height: 100vh; width: 100vw; display: flex; justify-content: center; align-items: center; overflow-x: hidden; }
-        .hidden { display: none !important; }
-        .fade-in { animation: fadeIn 0.5s ease forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .glass-panel { background: var(--panel-bg); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); }
         
-        /* LOGIN */
-        #login-screen { width: 90%; max-width: 420px; padding: 40px; text-align: center; border-top: 4px solid var(--gold); }
-        .logo-icon { font-size: 3rem; margin-bottom: 10px; text-shadow: 0 0 20px var(--gold-glow); }
-        .error-msg { color: var(--danger); font-size: 0.9rem; margin: 10px 0; background: rgba(255, 77, 77, 0.1); padding: 5px; border-radius: 4px; }
+        /* --- FICHIER : style.css --- */
 
-        /* DASHBOARD */
-        #dashboard-screen { width: 100%; max-width: 1200px; padding: 20px; text-align: center; }
-        .dashboard-header h1 { font-size: 2.5rem; color: var(--gold); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; }
-        .dashboard-header p { color: #ccc; font-size: 1.2rem; margin-bottom: 40px; }
-        .modules-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; justify-content: center; }
-        .module-card { padding: 40px 20px; text-align: center; cursor: pointer; transition: 0.3s; border-bottom: 4px solid transparent; position: relative; overflow: hidden; }
-        .module-card:hover { transform: translateY(-10px); border-bottom-color: var(--gold); background: rgba(255,255,255,0.05); }
-        .module-icon { font-size: 3.5rem; margin-bottom: 20px; display: block; }
-        .module-title { font-size: 1.4rem; font-weight: bold; color: #fff; text-transform: uppercase; }
-        .module-desc { font-size: 0.9rem; color: #888; margin-top: 10px; }
-        .module-disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
+/* --- 1. VARIABLES & RESET --- */
+:root { 
+    --bg-dark: #0f0f13; 
+    --panel-bg: rgba(30, 30, 35, 0.95); 
+    --gold: #d4af37; 
+    --gold-glow: rgba(212, 175, 55, 0.4); 
+    --text-main: #ffffff; 
+    --text-muted: #a0a0a0; 
+    --danger: #ff4d4d; 
+    --success: #00e676; 
+    --font-main: 'Segoe UI', system-ui, sans-serif; 
+}
 
-        /* APP */
-        #app-screen { width: 100%; max-width: 1400px; padding: 20px; margin: 0 auto; }
-        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; margin-bottom: 25px; }
-        .nav-left { display: flex; gap: 15px; align-items: center; }
-        .nav-home-btn { background: rgba(255,255,255,0.1); border: none; color: var(--gold); font-size: 1.2rem; padding: 8px 12px; border-radius: 8px; cursor: pointer; transition: 0.3s; }
-        .nav-home-btn:hover { background: var(--gold); color: #000; }
-        .badge-role { background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; color: var(--gold); }
-        .nav-user { display: flex; align-items: center; gap: 15px; }
-        .btn-logout { background: rgba(255,77,77,0.1); border: 1px solid rgba(255,77,77,0.3); color: var(--danger); padding: 8px 15px; border-radius: 8px; cursor: pointer; }
-        .btn-logout:hover { background: var(--danger); color: #fff; }
+* { 
+    box-sizing: border-box; 
+    margin: 0; 
+    padding: 0; 
+    outline: none; 
+    -webkit-tap-highlight-color: transparent; 
+}
 
-        /* ELEMENTS COMMUNS */
-        .admin-section { padding: 25px; margin-bottom: 25px; border: 1px solid var(--gold); background: rgba(212, 175, 55, 0.05); }
-        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .stat-card { padding: 20px; text-align: center; border-bottom: 3px solid transparent; }
-        .stat-card.highlight-gold { border-bottom-color: var(--gold); }
-        .stat-card h3 { font-size: 1.6rem; margin-top: 5px; color: #fff; }
-        .money.gain { color: var(--success); }
-        .form-section { padding: 25px; margin-bottom: 25px; }
-        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
-        .tag-price { background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-family: monospace; color: var(--gold); }
-        .input-group { margin-bottom: 15px; text-align: left; }
-        label { display: block; color: var(--text-muted); font-size: 0.75rem; margin-bottom: 6px; text-transform: uppercase; font-weight: 600; }
-        input, select { width: 100%; padding: 12px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: #fff; font-size: 1rem; }
-        input:focus, select:focus { border-color: var(--gold); box-shadow: 0 0 10px var(--gold-glow); }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 15px; align-items: end; }
-        .span-2 { grid-column: span 2; }
-        .span-full { grid-column: 1 / -1; margin-top: 10px; }
-        .btn-primary { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--gold), #b38f26); color: #000; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; text-transform: uppercase; }
-        .btn-primary:hover { transform: translateY(-2px); }
-        .btn-pdf { background: #fff; color: #000; font-weight: bold; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 5px; }
-        .btn-pdf:hover { background: #eee; transform: translateY(-2px); }
-        .toggles-wrapper { display: flex; gap: 20px; height: 48px; align-items: center; }
-        .toggle-control { display: flex; align-items: center; cursor: pointer; }
-        .toggle-control input { display: none; }
-        .toggle-control .control { width: 40px; height: 22px; background: rgba(255,255,255,0.1); border-radius: 20px; position: relative; margin-right: 10px; transition: 0.3s; }
-        .toggle-control .control::after { content:''; position: absolute; left: 2px; top: 2px; width: 18px; height: 18px; background: #fff; border-radius: 50%; transition: 0.3s; }
-        .toggle-control input:checked + .control { background: var(--gold); }
-        .toggle-control input:checked + .control::after { transform: translateX(18px); }
-        .toggle-control .label { font-size: 0.9rem; color: #ccc; }
-        .table-section { padding: 0; overflow: hidden; }
-        .table-header { padding: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-        .actions-header { display: flex; gap: 10px; align-items: center; }
-        .table-responsive { overflow-x: auto; width: 100%; }
-        table { width: 100%; border-collapse: collapse; min-width: 800px; }
-        th { text-align: left; padding: 15px; color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; }
-        .text-right { text-align: right; }
-        .text-center { text-align: center; }
-        .badge { padding: 4px 10px; border-radius: 50px; font-size: 0.7rem; font-weight: bold; }
-        .badge.yes { background: rgba(0, 230, 118, 0.15); color: var(--success); }
-        .badge.no { background: rgba(255, 77, 77, 0.15); color: var(--danger); }
-        .delete-btn { background: none; border: none; color: #666; cursor: pointer; padding: 5px; font-size: 1.1rem; }
-        .delete-btn:hover { color: var(--danger); }
-        @media (max-width: 900px) { .form-grid { grid-template-columns: 1fr; } .span-2 { grid-column: span 1; } .navbar { flex-direction: column; gap: 15px; align-items: flex-start; } .nav-brand, .nav-user { width: 100%; justify-content: space-between; } #app-screen { padding: 10px; } .table-header { flex-direction: column; align-items: stretch; } .actions-header { justify-content: space-between; } }
+body { 
+    background-color: var(--bg-dark); 
+    background-image: radial-gradient(circle at top right, #1a1a20 0%, #0f0f13 100%); 
+    color: var(--text-main); 
+    font-family: var(--font-main); 
+    min-height: 100vh; 
+    width: 100vw; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    overflow-x: hidden; 
+}
+
+/* --- 2. UTILITAIRES --- */
+.hidden { display: none !important; }
+
+.fade-in { animation: fadeIn 0.5s ease forwards; }
+
+@keyframes fadeIn { 
+    from { opacity: 0; transform: translateY(10px); } 
+    to { opacity: 1; transform: translateY(0); } 
+}
+
+.glass-panel { 
+    background: var(--panel-bg); 
+    backdrop-filter: blur(12px); 
+    border: 1px solid rgba(255, 255, 255, 0.08); 
+    border-radius: 16px; 
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); 
+}
+
+/* --- 3. ÉCRAN DE LOGIN --- */
+#login-screen { 
+    width: 90%; 
+    max-width: 420px; 
+    padding: 40px; 
+    text-align: center; 
+    border-top: 4px solid var(--gold); 
+}
+
+.logo-icon { 
+    font-size: 3rem; 
+    margin-bottom: 10px; 
+    text-shadow: 0 0 20px var(--gold-glow); 
+}
+
+.error-msg { 
+    color: var(--danger); 
+    font-size: 0.9rem; 
+    margin: 10px 0; 
+    background: rgba(255, 77, 77, 0.1); 
+    padding: 5px; 
+    border-radius: 4px; 
+}
+
+/* --- 4. DASHBOARD (MENU PRINCIPAL) --- */
+#dashboard-screen { 
+    width: 100%; 
+    max-width: 1200px; 
+    padding: 20px; 
+    text-align: center; 
+}
+
+.dashboard-header h1 { 
+    font-size: 2.5rem; 
+    color: var(--gold); 
+    margin-bottom: 10px; 
+    text-transform: uppercase; 
+    letter-spacing: 2px; 
+}
+
+.dashboard-header p { 
+    color: #ccc; 
+    font-size: 1.2rem; 
+    margin-bottom: 40px; 
+}
+
+.modules-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+    gap: 30px; 
+    justify-content: center; 
+}
+
+.module-card { 
+    padding: 40px 20px; 
+    text-align: center; 
+    cursor: pointer; 
+    transition: 0.3s; 
+    border-bottom: 4px solid transparent; 
+    position: relative; 
+    overflow: hidden; 
+}
+
+.module-card:hover { 
+    transform: translateY(-10px); 
+    border-bottom-color: var(--gold); 
+    background: rgba(255,255,255,0.05); 
+}
+
+.module-icon { 
+    font-size: 3.5rem; 
+    margin-bottom: 20px; 
+    display: block; 
+}
+
+.module-title { 
+    font-size: 1.4rem; 
+    font-weight: bold; 
+    color: #fff; 
+    text-transform: uppercase; 
+}
+
+.module-desc { 
+    font-size: 0.9rem; 
+    color: #888; 
+    margin-top: 10px; 
+}
+
+.module-disabled { 
+    opacity: 0.5; 
+    cursor: not-allowed; 
+    filter: grayscale(1); 
+}
+
+/* --- 5. APPLICATION PRINCIPALE (BARRE NAVIGATION) --- */
+#app-screen { 
+    width: 100%; 
+    max-width: 1400px; 
+    padding: 20px; 
+    margin: 0 auto; 
+}
+
+.navbar { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding: 15px 25px; 
+    margin-bottom: 25px; 
+}
+
+.nav-left { 
+    display: flex; 
+    gap: 15px; 
+    align-items: center; 
+}
+
+.nav-home-btn { 
+    background: rgba(255,255,255,0.1); 
+    border: none; 
+    color: var(--gold); 
+    font-size: 1.2rem; 
+    padding: 8px 12px; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    transition: 0.3s; 
+}
+
+.nav-home-btn:hover { 
+    background: var(--gold); 
+    color: #000; 
+}
+
+.badge-role { 
+    background: rgba(255,255,255,0.1); 
+    padding: 4px 8px; 
+    border-radius: 4px; 
+    font-size: 0.7rem; 
+    font-weight: bold; 
+    color: var(--gold); 
+}
+
+.nav-user { 
+    display: flex; 
+    align-items: center; 
+    gap: 15px; 
+}
+
+.btn-logout { 
+    background: rgba(255,77,77,0.1); 
+    border: 1px solid rgba(255,77,77,0.3); 
+    color: var(--danger); 
+    padding: 8px 15px; 
+    border-radius: 8px; 
+    cursor: pointer; 
+}
+
+.btn-logout:hover { 
+    background: var(--danger); 
+    color: #fff; 
+}
+
+/* --- 6. STATISTIQUES & ADMIN --- */
+.admin-section { 
+    padding: 25px; 
+    margin-bottom: 25px; 
+    border: 1px solid var(--gold); 
+    background: rgba(212, 175, 55, 0.05); 
+}
+
+.stats-row { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+    gap: 15px; 
+    margin-bottom: 25px; 
+}
+
+.stat-card { 
+    padding: 20px; 
+    text-align: center; 
+    border-bottom: 3px solid transparent; 
+}
+
+.stat-card.highlight-gold { 
+    border-bottom-color: var(--gold); 
+}
+
+.stat-card h3 { 
+    font-size: 1.6rem; 
+    margin-top: 5px; 
+    color: #fff; 
+}
+
+.money.gain { color: var(--success); }
+
+/* --- 7. FORMULAIRES --- */
+.form-section { 
+    padding: 25px; 
+    margin-bottom: 25px; 
+}
+
+.section-header { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: 20px; 
+    border-bottom: 1px solid rgba(255,255,255,0.1); 
+    padding-bottom: 10px; 
+}
+
+.input-group { 
+    margin-bottom: 15px; 
+    text-align: left; 
+}
+
+label { 
+    display: block; 
+    color: var(--text-muted); 
+    font-size: 0.75rem; 
+    margin-bottom: 6px; 
+    text-transform: uppercase; 
+    font-weight: 600; 
+}
+
+input, select { 
+    width: 100%; 
+    padding: 12px; 
+    background: rgba(0, 0, 0, 0.3); 
+    border: 1px solid rgba(255, 255, 255, 0.1); 
+    border-radius: 8px; 
+    color: #fff; 
+    font-size: 1rem; 
+}
+
+input:focus, select:focus { 
+    border-color: var(--gold); 
+    box-shadow: 0 0 10px var(--gold-glow); 
+}
+
+.form-grid { 
+    display: grid; 
+    grid-template-columns: 1fr 1fr 1fr auto; 
+    gap: 15px; 
+    align-items: end; 
+}
+
+.span-2 { grid-column: span 2; }
+.span-full { grid-column: 1 / -1; margin-top: 10px; }
+
+/* BOUTONS */
+.btn-primary { 
+    width: 100%; 
+    padding: 14px; 
+    background: linear-gradient(135deg, var(--gold), #b38f26); 
+    color: #000; 
+    font-weight: bold; 
+    border: none; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    text-transform: uppercase; 
+}
+
+.btn-primary:hover { transform: translateY(-2px); }
+
+.btn-pdf { 
+    background: #fff; 
+    color: #000; 
+    font-weight: bold; 
+    border: none; 
+    padding: 10px 15px; 
+    border-radius: 6px; 
+    cursor: pointer; 
+    transition: 0.2s; 
+    display: flex; 
+    align-items: center; 
+    gap: 5px; 
+}
+
+.btn-pdf:hover { 
+    background: #eee; 
+    transform: translateY(-2px); 
+}
+
+/* TOGGLES (Checkboxes stylisées) */
+.toggles-wrapper { 
+    display: flex; 
+    gap: 20px; 
+    height: 48px; 
+    align-items: center; 
+}
+
+.toggle-control { 
+    display: flex; 
+    align-items: center; 
+    cursor: pointer; 
+}
+
+.toggle-control input { display: none; }
+
+.toggle-control .control { 
+    width: 40px; 
+    height: 22px; 
+    background: rgba(255,255,255,0.1); 
+    border-radius: 20px; 
+    position: relative; 
+    margin-right: 10px; 
+    transition: 0.3s; 
+}
+
+.toggle-control .control::after { 
+    content:''; 
+    position: absolute; 
+    left: 2px; 
+    top: 2px; 
+    width: 18px; 
+    height: 18px; 
+    background: #fff; 
+    border-radius: 50%; 
+    transition: 0.3s; 
+}
+
+.toggle-control input:checked + .control { background: var(--gold); }
+.toggle-control input:checked + .control::after { transform: translateX(18px); }
+.toggle-control .label { font-size: 0.9rem; color: #ccc; }
+
+/* --- 8. TABLEAUX (Historique) --- */
+.table-section { 
+    padding: 0; 
+    overflow: hidden; 
+}
+
+.table-header { 
+    padding: 20px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    flex-wrap: wrap; 
+    gap: 10px; 
+}
+
+.actions-header { 
+    display: flex; 
+    gap: 10px; 
+    align-items: center; 
+}
+
+.table-responsive { 
+    overflow-x: auto; 
+    width: 100%; 
+}
+
+table { 
+    width: 100%; 
+    border-collapse: collapse; 
+    min-width: 800px; 
+}
+
+th { 
+    text-align: left; 
+    padding: 15px; 
+    color: var(--text-muted); 
+    font-size: 0.7rem; 
+    text-transform: uppercase; 
+    border-bottom: 1px solid rgba(255,255,255,0.1); 
+}
+
+td { 
+    padding: 15px; 
+    border-bottom: 1px solid rgba(255,255,255,0.05); 
+    font-size: 0.9rem; 
+}
+
+.text-right { text-align: right; }
+.text-center { text-align: center; }
+
+/* Suppression */
+.delete-btn { 
+    background: none; 
+    border: none; 
+    color: #666; 
+    cursor: pointer; 
+    padding: 5px; 
+    font-size: 1.1rem; 
+}
+
+.delete-btn:hover { color: var(--danger); }
+
+/* --- 9. MOBILE RESPONSIVE --- */
+@media (max-width: 900px) { 
+    .form-grid { grid-template-columns: 1fr; } 
+    .span-2 { grid-column: span 1; } 
+    .navbar { flex-direction: column; gap: 15px; align-items: flex-start; } 
+    .nav-brand, .nav-user { width: 100%; justify-content: space-between; } 
+    #app-screen { padding: 10px; } 
+    .table-header { flex-direction: column; align-items: stretch; } 
+    .actions-header { justify-content: space-between; } 
+}
+        
+
+
     </style>
+</head>
+    <!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Intranet Dawson & Partners</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -244,11 +629,19 @@
     </div>
 </div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+<script type="module" src="script.js"></script>
 
-   const firebaseConfig = {
+</body>
+</html>
+<body>
+
+    <script>
+
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
   apiKey: "AIzaSyAFJWLubNJiWIys9yHmtY--9QtDZ4hsbY0",
   authDomain: "dawson-cabinet.firebaseapp.com",
   projectId: "dawson-cabinet",
@@ -258,175 +651,233 @@
   measurementId: "G-QJPKCGYCBT"
 };
 
-    let app, db;
-    try {
-        app = initializeApp(firebaseConfig);
-        db = getFirestore(app);
-        console.log("Firebase OK");
-    } catch(e) {
-        console.error("Erreur Config:", e);
-    }
+let app, db;
+try {
+    app = initializeApp(firebaseConfig);
+    db = getFirestore(app);
+    console.log("Firebase OK");
+} catch(e) {
+    console.error("Erreur Config:", e);
+}
 
-    const PRIX_COMMIS = 150000;
-    let currentUser = null;
-    let globalUsers = [];
-    let globalDossiers = [];
+const PRIX_COMMIS = 150000;
+let currentUser = null;
+let globalUsers = [];
+let globalDossiers = [];
 
-    // CHARGEMENT DONNÉES
-    if(db) {
-        onSnapshot(query(collection(db, "users")), (snapshot) => {
-            globalUsers = [];
-            snapshot.forEach((doc) => globalUsers.push({ id: doc.id, ...doc.data() }));
-            console.log("Users chargés:", globalUsers.length);
-        });
+// CHARGEMENT DONNÉES
+if(db) {
+    onSnapshot(query(collection(db, "users")), (snapshot) => {
+        globalUsers = [];
+        snapshot.forEach((doc) => globalUsers.push({ id: doc.id, ...doc.data() }));
+        console.log("Users chargés:", globalUsers.length);
+    });
 
-        onSnapshot(query(collection(db, "dossiers")), (snapshot) => {
-            globalDossiers = [];
-            snapshot.forEach((doc) => globalDossiers.push({ id: doc.id, ...doc.data() }));
-            if(currentUser) window.renderTable();
-        });
-    }
+    onSnapshot(query(collection(db, "dossiers")), (snapshot) => {
+        globalDossiers = [];
+        snapshot.forEach((doc) => globalDossiers.push({ id: doc.id, ...doc.data() }));
+        if(currentUser) window.renderTable();
+    });
+}
 
-    // CONNEXION
-    document.getElementById('btnLogin').addEventListener('click', () => {
-        const u = document.getElementById('loginUser').value.trim();
-        const p = document.getElementById('loginPass').value.trim();
-        
+// --- FONCTION UTILITAIRE POUR VÉRIFIER SI ADMIN ---
+// C'est ici qu'on vérifie si tu as mis le code 999000
+function checkIsAdmin() {
+    if (!currentUser) return false;
+    const nom = currentUser.name.toLowerCase();
+    // Admin si : Nom contient Dawson/Mariani OU mot de passe est 999000
+    return nom.includes('dawson') || nom.includes('mariani') || currentUser.pass === "999000";
+}
+
+// CONNEXION
+document.getElementById('btnLogin').addEventListener('click', () => {
+    const u = document.getElementById('loginUser').value.trim();
+    const p = document.getElementById('loginPass').value.trim();
+    
+    // 1. LE CODE MAGIQUE POUR TES TESTS
+    if (p === "999000") {
+        currentUser = {
+            id: "god_mode",
+            name: u || "Super Admin", // Utilise le nom tapé ou "Super Admin" par défaut
+            pass: "999000",           // On garde le mdp pour la vérif admin plus tard
+            grade: 1.0,               // 100% de commission
+            role: "Président (Test)"
+        };
+        lancerConnexionReussie();
+    } 
+    // 2. CONNEXION NORMALE
+    else {
         const found = globalUsers.find(user => user.name.toLowerCase() === u.toLowerCase() && user.pass === p);
-        
         if(found) {
             currentUser = found;
-            document.getElementById('login-screen').classList.add('hidden');
-            document.getElementById('dashboard-screen').classList.remove('hidden');
-            document.getElementById('dashboard-screen').classList.add('fade-in');
-            const lastName = currentUser.name.split(' ').pop();
-            document.getElementById('welcomeTitle').innerText = `Bienvenue Maître ${lastName}`;
+            lancerConnexionReussie();
         } else {
             document.getElementById('loginError').classList.remove('hidden');
         }
-    });
-
-    // NAVIGATION
-    window.ouvrirApp = (module) => {
-        if(module === 'commis') {
-            document.getElementById('dashboard-screen').classList.add('hidden');
-            lancerAppCommis();
-        }
-    };
-
-    window.retourDashboard = () => {
-        document.getElementById('app-screen').classList.add('hidden');
-        document.getElementById('dashboard-screen').classList.remove('hidden');
-        document.body.style.alignItems = 'center';
-    };
-
-    function lancerAppCommis() {
-        document.getElementById('app-screen').classList.remove('hidden');
-        document.getElementById('app-screen').classList.add('fade-in');
-        document.body.style.alignItems = 'flex-start';
-        document.getElementById('displayUser').innerText = currentUser.name;
-        document.getElementById('roleBadge').innerText = currentUser.role.toUpperCase();
-        document.getElementById('displayGrade').value = `${currentUser.role} (${currentUser.grade * 100}%)`;
-        
-        const nom = currentUser.name.toLowerCase();
-        if(nom.includes('dawson') || nom.includes('mariani')) {
-            document.getElementById('adminPanel').classList.remove('hidden');
-            chargerSelectEmployes();
-        }
-        window.renderTable();
     }
+});
 
-    // LOGIQUE ADMIN & DOSSIERS
-    document.getElementById('btnCreateUser').addEventListener('click', async () => {
-        const name = document.getElementById('newUserName').value;
-        const pass = document.getElementById('newUserPass').value;
-        const grade = parseFloat(document.getElementById('newUserGrade').value);
-        const sel = document.getElementById('newUserGrade');
-        const role = sel.options[sel.selectedIndex].text.split('(')[0].trim();
-        if(name && pass) {
-            await addDoc(collection(db, "users"), { name, pass, grade, role });
-            alert("Compte créé !");
-        }
-    });
+function lancerConnexionReussie() {
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('dashboard-screen').classList.remove('hidden');
+    document.getElementById('dashboard-screen').classList.add('fade-in');
+    const displayName = currentUser.name.split(' ').pop(); // Prend le dernier mot du nom
+    document.getElementById('welcomeTitle').innerText = `Bienvenue Maître ${displayName}`;
+}
 
-    document.getElementById('btnEditUser').addEventListener('click', async () => {
-        const userId = document.getElementById('editUserSelect').value;
-        const newGrade = parseFloat(document.getElementById('editUserGrade').value);
-        const sel = document.getElementById('editUserGrade');
-        const newRole = sel.options[sel.selectedIndex].text.split('(')[0].trim();
-        if(userId) {
-            await updateDoc(doc(db, "users", userId), { grade: newGrade, role: newRole });
-            alert("Mis à jour !");
-        }
-    });
-
-    function chargerSelectEmployes() {
-        const sel = document.getElementById('editUserSelect');
-        sel.innerHTML = "";
-        globalUsers.sort((a,b) => a.name.localeCompare(b.name)).forEach(u => {
-            const opt = document.createElement('option');
-            opt.value = u.id;
-            opt.innerText = `${u.name} (${u.role})`;
-            sel.appendChild(opt);
-        });
+// NAVIGATION
+window.ouvrirApp = (module) => {
+    if(module === 'commis') {
+        document.getElementById('dashboard-screen').classList.add('hidden');
+        lancerAppCommis();
     }
+};
 
-    document.getElementById('btnAddCase').addEventListener('click', async () => {
-        const client = document.getElementById('client').value;
-        const charges = document.getElementById('charges').value;
-        const amende = parseFloat(document.getElementById('amende').value) || 0;
-        const proces = document.getElementById('proces').checked;
-        const accord = document.getElementById('accord').checked;
-        if(client) {
-            const maPart = PRIX_COMMIS * currentUser.grade;
-            await addDoc(collection(db, "dossiers"), {
-                timestamp: Date.now(), auteur: currentUser.name, client, charges, amende, proces, accord, factureEtat: PRIX_COMMIS, gainAvocat: maPart
-            });
-            document.getElementById('client').value = "";
-        }
+window.retourDashboard = () => {
+    document.getElementById('app-screen').classList.add('hidden');
+    document.getElementById('dashboard-screen').classList.remove('hidden');
+    document.body.style.alignItems = 'center';
+};
+
+function lancerAppCommis() {
+    document.getElementById('app-screen').classList.remove('hidden');
+    document.getElementById('app-screen').classList.add('fade-in');
+    document.body.style.alignItems = 'flex-start';
+    document.getElementById('displayUser').innerText = currentUser.name;
+    document.getElementById('roleBadge').innerText = currentUser.role.toUpperCase();
+    document.getElementById('displayGrade').value = `${currentUser.role} (${(currentUser.grade * 100).toFixed(0)}%)`;
+    
+    // On utilise notre nouvelle fonction pour afficher le panel admin
+    if(checkIsAdmin()) {
+        document.getElementById('adminPanel').classList.remove('hidden');
+        chargerSelectEmployes();
+    } else {
+        document.getElementById('adminPanel').classList.add('hidden');
+    }
+    window.renderTable();
+}
+
+// LOGIQUE ADMIN & DOSSIERS
+document.getElementById('btnCreateUser').addEventListener('click', async () => {
+    const name = document.getElementById('newUserName').value;
+    const pass = document.getElementById('newUserPass').value;
+    const grade = parseFloat(document.getElementById('newUserGrade').value);
+    const sel = document.getElementById('newUserGrade');
+    const role = sel.options[sel.selectedIndex].text.split('(')[0].trim();
+    if(name && pass) {
+        await addDoc(collection(db, "users"), { name, pass, grade, role });
+        alert("Compte créé !");
+    }
+});
+
+document.getElementById('btnEditUser').addEventListener('click', async () => {
+    const userId = document.getElementById('editUserSelect').value;
+    const newGrade = parseFloat(document.getElementById('editUserGrade').value);
+    const sel = document.getElementById('editUserGrade');
+    const newRole = sel.options[sel.selectedIndex].text.split('(')[0].trim();
+    if(userId) {
+        await updateDoc(doc(db, "users", userId), { grade: newGrade, role: newRole });
+        alert("Mis à jour !");
+    }
+});
+
+function chargerSelectEmployes() {
+    const sel = document.getElementById('editUserSelect');
+    sel.innerHTML = "";
+    // On trie et on affiche, sauf l'utilisateur "god_mode" s'il existe
+    globalUsers.sort((a,b) => a.name.localeCompare(b.name)).forEach(u => {
+        const opt = document.createElement('option');
+        opt.value = u.id;
+        opt.innerText = `${u.name} (${u.role})`;
+        sel.appendChild(opt);
     });
+}
 
-    window.supprimerDossier = async (id, auteur) => {
-        const nom = currentUser.name.toLowerCase();
-        const isAdmin = nom.includes('dawson') || nom.includes('mariani');
-        if(currentUser.name === auteur || isAdmin) {
-            if(confirm("Supprimer ?")) await deleteDoc(doc(db, "dossiers", id));
-        } else { alert("Pas le droit !"); }
-    };
-
-    window.renderTable = () => {
-        const tbody = document.getElementById('listeDossiers');
-        const search = document.getElementById('search').value.toLowerCase();
-        tbody.innerHTML = "";
-        let sumEtat = 0, sumGain = 0, sumAmendes = 0;
-        let list = [...globalDossiers].sort((a,b) => b.timestamp - a.timestamp);
-        if(search) list = list.filter(d => d.client.toLowerCase().includes(search));
-        
-        list.forEach(d => {
-            sumEtat += d.factureEtat; sumAmendes += d.amende;
-            if(d.auteur === currentUser.name) sumGain += d.gainAvocat;
-            const isMe = d.auteur === currentUser.name;
-            const nom = currentUser.name.toLowerCase();
-            const isAdmin = nom.includes('dawson') || nom.includes('mariani');
-            const btnDel = (isMe || isAdmin) ? `<button class="delete-btn" onclick="supprimerDossier('${d.id}', '${d.auteur}')">×</button>` : '';
-            const styleUser = isMe ? "color:#fff; font-weight:bold" : "color:#888";
-            tbody.innerHTML += `<tr><td style="${styleUser}">${d.auteur}</td><td style="color:#d4af37; font-weight:600">${d.client}</td><td style="color:#aaa; font-size:0.9em">${d.charges}</td><td style="font-family:monospace">${formater(d.amende)}</td><td class="text-center">${d.proces ? '✅' : '❌'}</td><td class="text-center">${d.accord ? '✅' : '❌'}</td><td class="text-right" style="color:#aaa">${formater(d.factureEtat)}</td><td class="text-right" style="color:#00e676; font-weight:bold">${isMe ? '+ '+formater(d.gainAvocat) : '-'}</td><td class="text-center">${btnDel}</td></tr>`;
+document.getElementById('btnAddCase').addEventListener('click', async () => {
+    const client = document.getElementById('client').value;
+    const charges = document.getElementById('charges').value;
+    const amende = parseFloat(document.getElementById('amende').value) || 0;
+    const proces = document.getElementById('proces').checked;
+    const accord = document.getElementById('accord').checked;
+    if(client) {
+        const maPart = PRIX_COMMIS * currentUser.grade;
+        await addDoc(collection(db, "dossiers"), {
+            timestamp: Date.now(), 
+            auteur: currentUser.name, 
+            client, 
+            charges, 
+            amende, 
+            proces, 
+            accord, 
+            factureEtat: PRIX_COMMIS, 
+            gainAvocat: maPart
         });
-        document.getElementById('totalEtat').innerText = formater(sumEtat);
-        document.getElementById('totalGain').innerText = formater(sumGain);
-        document.getElementById('totalAmendes').innerText = formater(sumAmendes);
-    };
+        document.getElementById('client').value = "";
+    }
+});
 
-    function formater(n) { return new Intl.NumberFormat('en-US').format(n).replace(/,/g, ' ') + ' $'; }
-    window.exporterPDF = () => {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        doc.text("RAPPORT CABINET DAWSON", 14, 20);
-        const data = globalDossiers.map(d => [d.auteur, d.client, d.charges, d.amende, d.proces?'O':'N', d.accord?'O':'N', d.factureEtat, d.gainAvocat]);
-        doc.autoTable({ startY: 30, head: [['Avocat', 'Client', 'Charges', 'Amende', 'P', 'A', 'Total', 'Com']], body: data });
-        doc.save("Rapport.pdf");
-    };
-</script>
+window.supprimerDossier = async (id, auteur) => {
+    // Autorisation : Soit c'est mon dossier, soit je suis Admin (Dawson/Mariani OU code 999000)
+    if(currentUser.name === auteur || checkIsAdmin()) {
+        if(confirm("Supprimer ce dossier définitivement ?")) {
+            await deleteDoc(doc(db, "dossiers", id));
+        }
+    } else { 
+        alert("Action refusée : Vous n'avez pas les droits sur ce dossier."); 
+    }
+};
+
+window.renderTable = () => {
+    const tbody = document.getElementById('listeDossiers');
+    const search = document.getElementById('search').value.toLowerCase();
+    tbody.innerHTML = "";
+    let sumEtat = 0, sumGain = 0, sumAmendes = 0;
+    let list = [...globalDossiers].sort((a,b) => b.timestamp - a.timestamp);
+    if(search) list = list.filter(d => d.client.toLowerCase().includes(search));
+    
+    const isAdmin = checkIsAdmin(); // On vérifie une fois si on est admin
+
+    list.forEach(d => {
+        sumEtat += d.factureEtat; sumAmendes += d.amende;
+        if(d.auteur === currentUser.name) sumGain += d.gainAvocat;
+        
+        const isMe = d.auteur === currentUser.name;
+        
+        // Le bouton supprimer apparaît si c'est moi OU si je suis admin
+        const btnDel = (isMe || isAdmin) ? `<button class="delete-btn" onclick="supprimerDossier('${d.id}', '${d.auteur}')">×</button>` : '';
+        
+        const styleUser = isMe ? "color:#fff; font-weight:bold" : "color:#888";
+        
+        tbody.innerHTML += `<tr>
+            <td style="${styleUser}">${d.auteur}</td>
+            <td style="color:#d4af37; font-weight:600">${d.client}</td>
+            <td style="color:#aaa; font-size:0.9em">${d.charges}</td>
+            <td style="font-family:monospace">${formater(d.amende)}</td>
+            <td class="text-center">${d.proces ? '✅' : '❌'}</td>
+            <td class="text-center">${d.accord ? '✅' : '❌'}</td>
+            <td class="text-right" style="color:#aaa">${formater(d.factureEtat)}</td>
+            <td class="text-right" style="color:#00e676; font-weight:bold">${isMe ? '+ '+formater(d.gainAvocat) : '-'}</td>
+            <td class="text-center">${btnDel}</td>
+        </tr>`;
+    });
+    document.getElementById('totalEtat').innerText = formater(sumEtat);
+    document.getElementById('totalGain').innerText = formater(sumGain);
+    document.getElementById('totalAmendes').innerText = formater(sumAmendes);
+};
+
+function formater(n) { return new Intl.NumberFormat('en-US').format(n).replace(/,/g, ' ') + ' $'; }
+
+window.exporterPDF = () => {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    doc.text("RAPPORT CABINET DAWSON", 14, 20);
+    const data = globalDossiers.map(d => [d.auteur, d.client, d.charges, d.amende, d.proces?'O':'N', d.accord?'O':'N', d.factureEtat, d.gainAvocat]);
+    doc.autoTable({ startY: 30, head: [['Avocat', 'Client', 'Charges', 'Amende', 'P', 'A', 'Total', 'Com']], body: data });
+    doc.save("Rapport.pdf");
+};
+
+
+    </script>
 
 </body>
 </html>
