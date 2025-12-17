@@ -3,43 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TEST DEBUG - Dawson</title>
+    <title>MODE DIAGNOSTIC - Dawson</title>
     <style>
-        body { background: #111; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
-        .box { background: #222; padding: 40px; border: 2px solid #d4af37; border-radius: 10px; text-align: center; width: 300px;}
-        input { display: block; width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none; }
-        button { background: #d4af37; color: black; font-weight: bold; border: none; padding: 15px; width: 100%; cursor: pointer; }
-        h1 { color: #d4af37; }
-        .hidden { display: none; }
+        body { background: #121212; color: white; font-family: monospace; padding: 20px; }
+        h1 { color: #d4af37; text-align: center; }
+        .box { max-width: 600px; margin: 0 auto; background: #1e1e1e; padding: 20px; border-radius: 10px; border: 1px solid #333; }
+        
+        /* Console de débogage visuelle */
+        #debug-console { 
+            background: #000; border: 2px solid #555; padding: 15px; 
+            margin-top: 20px; min-height: 200px; white-space: pre-wrap; font-size: 13px;
+        }
+        .log { color: #0f0; } /* Vert */
+        .warn { color: orange; } /* Orange */
+        .error { color: #ff4d4d; font-weight: bold; border-left: 4px solid red; padding-left: 10px; } /* Rouge */
+
+        input { width: 100%; padding: 10px; margin: 5px 0; background: #333; border: 1px solid #555; color: white; }
+        button { width: 100%; padding: 15px; background: #d4af37; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-    <div id="login-screen" class="box">
-        <h1>TEST CONNEXION</h1>
-        <p>Ouvre ce fichier, si aucune alerte ne s'affiche au démarrage, c'est que ton navigateur bloque le script.</p>
-        <input type="text" id="loginUser" placeholder="Nom Prénom (ex: James Dawson)">
-        <input type="password" id="loginPass" placeholder="Mot de passe">
-        <button id="btnLogin">TESTER LA CONNEXION</button>
-        <p id="status" style="color: yellow; margin-top: 20px;">En attente...</p>
+    <h1>MODE DIAGNOSTIC</h1>
+    
+    <div class="box">
+        <h3>Test de Connexion</h3>
+        <input type="text" id="testUser" placeholder="Identifiant (ex: paul mariani)">
+        <input type="password" id="testPass" placeholder="Mot de passe">
+        <button id="btnTest">TESTER LA CONNEXION</button>
     </div>
 
-    <div id="success-screen" class="box hidden">
-        <h1 style="color: green;">ÇA MARCHE !</h1>
-        <p>Bienvenue <span id="userName"></span></p>
-        <p>Rôle : <span id="userRole"></span></p>
-        <p>Tu peux maintenant remettre le code complet !</p>
-    </div>
+    <div id="debug-console">Initialisation du système de diagnostic...<br></div>
 
     <script type="module">
-        // 1. IMPORTATION
+        // Fonction pour écrire dans la console visuelle
+        function log(msg, type = 'log') {
+            const el = document.getElementById('debug-console');
+            el.innerHTML += `<div class="${type}">> ${msg}</div>`;
+        }
+
+        // 1. Capturer les erreurs de syntaxe globales
+        window.onerror = function(message, source, lineno, colno, error) {
+            log(`ERREUR CRITIQUE (Syntaxe) :\n${message}\nLigne: ${lineno}`, 'error');
+        };
+
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // Alerte de démarrage
-        alert("ETAPE 1 : Le script JavaScript démarre bien.");
+        try {
+            log("Modules Firebase importés avec succès.");
 
-       // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+           // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyAFJWLubNJiWIys9yHmtY--9QtDZ4hsbY0",
   authDomain: "dawson-cabinet.firebaseapp.com",
@@ -50,67 +64,56 @@ const firebaseConfig = {
   measurementId: "G-QJPKCGYCBT"
 };
 
-        let db;
-
-        try {
+            log("Configuration chargée. Connexion à Google...");
             const app = initializeApp(firebaseConfig);
-            db = getFirestore(app);
-            alert("ETAPE 2 : Firebase semble configuré (Techniquement). On va tester la base de données.");
-            document.getElementById('status').innerText = "Firebase initialisé...";
-        } catch (e) {
-            alert("ERREUR ETAPE 2 : Problème de configuration Firebase.\n" + e.message);
-        }
+            const db = getFirestore(app);
+            log("Firebase initialisé. Vérification de la base de données...");
 
-        // Action bouton
-        document.getElementById('btnLogin').addEventListener('click', async () => {
-            alert("ETAPE 3 : Bouton cliqué. Recherche en cours...");
-            
-            const u = document.getElementById('loginUser').value.trim();
-            const p = document.getElementById('loginPass').value.trim();
+            // Test automatique : Lire la liste des utilisateurs
+            getDocs(collection(db, "users"))
+                .then((snapshot) => {
+                    if (snapshot.empty) {
+                        log("⚠️ ATTENTION : Connexion réussie mais la collection 'users' est VIDE !", 'warn');
+                        log("Conseil : Va sur Firebase > Firestore > Données et crée la collection 'users' avec un premier compte.", 'warn');
+                    } else {
+                        log(`✅ SUCCÈS : ${snapshot.size} utilisateurs trouvés dans la base.`, 'log');
+                        let usersList = [];
+                        snapshot.forEach(doc => {
+                            const u = doc.data();
+                            log(`   - Trouvé : "${u.name}" (Pass: "${u.pass}")`);
+                            usersList.push(u);
+                        });
 
-            if(!u || !p) {
-                alert("Remplis les champs stp !");
-                return;
-            }
-
-            document.getElementById('status').innerText = "Recherche dans la base de données...";
-
-            try {
-                // On va chercher TOUS les utilisateurs pour voir ce qu'il y a
-                const q = collection(db, "users");
-                const querySnapshot = await getDocs(q);
-                
-                let found = false;
-                let userDetails = null;
-                let totalUsers = 0;
-
-                querySnapshot.forEach((doc) => {
-                    totalUsers++;
-                    const data = doc.data();
-                    // Comparaison simple
-                    if (data.name.toLowerCase() === u.toLowerCase() && data.pass === p) {
-                        found = true;
-                        userDetails = data;
+                        // Activer le bouton de test
+                        document.getElementById('btnTest').addEventListener('click', () => {
+                            const inputU = document.getElementById('testUser').value.trim();
+                            const inputP = document.getElementById('testPass').value.trim();
+                            
+                            log(`Tentative de connexion avec : "${inputU}" / "${inputP}"...`);
+                            
+                            const found = usersList.find(user => user.name.toLowerCase() === inputU.toLowerCase() && user.pass === inputP);
+                            
+                            if (found) {
+                                log(`✅ VALIDÉ ! Connexion réussie pour ${found.name}.`, 'log');
+                                log("CONCLUSION : Ton code marche. Remets le code original en faisant attention aux clés.", 'log');
+                            } else {
+                                log(`❌ ÉCHEC : Aucun utilisateur ne correspond. Vérifie l'orthographe exacte dans la liste ci-dessus.`, 'error');
+                            }
+                        });
+                    }
+                })
+                .catch((error) => {
+                    log(`ERREUR BASE DE DONNÉES :\n${error.message}`, 'error');
+                    if(error.message.includes("permission-denied")) {
+                        log("CAUSE PROBABLE : Tes règles de sécurité bloquent l'accès. Mets ta base en mode TEST.", 'warn');
                     }
                 });
 
-                if (totalUsers === 0) {
-                    alert("ERREUR CRITIQUE : La base de données est VIDE !\nTu n'as pas créé le compte 'James Dawson' dans Firestore (onglet Données).");
-                } else if (found) {
-                    alert("SUCCÈS : Utilisateur trouvé !");
-                    document.getElementById('login-screen').classList.add('hidden');
-                    document.getElementById('success-screen').classList.remove('hidden');
-                    document.getElementById('userName').innerText = userDetails.name;
-                    document.getElementById('userRole').innerText = userDetails.role;
-                } else {
-                    alert("ECHEC : Identifiants incorrects.\n\nIl y a " + totalUsers + " utilisateurs dans la base, mais aucun ne correspond à : " + u + " / " + p);
-                }
-
-            } catch (error) {
-                alert("ERREUR ETAPE 4 : Impossible de lire la base de données.\n\n" + error.message + "\n\n Vérifie que ta base est bien en mode TEST (Règles de sécurité).");
-                console.error(error);
-            }
-        });
+        } catch (e) {
+            log(`ERREUR CONFIGURATION :\n${e.message}`, 'error');
+            log("Vérifie que tu as bien copié les clés sans oublier de virgule ou de guillemet.", 'warn');
+        }
     </script>
+
 </body>
 </html>
