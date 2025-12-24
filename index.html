@@ -2,473 +2,490 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Intranet Dawson & Partners (God Mode)</title>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <title>Diamond City OS v13.0 - Cash Register</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* --- CSS INTÉGRÉ --- */
-        :root { --bg-dark: #0f0f13; --panel-bg: rgba(30, 30, 35, 0.95); --gold: #d4af37; --gold-glow: rgba(212, 175, 55, 0.4); --text-main: #ffffff; --text-muted: #a0a0a0; --danger: #ff4d4d; --success: #00e676; --font-main: 'Segoe UI', system-ui, sans-serif; }
-        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg-dark); background-image: radial-gradient(circle at top right, #1a1a20 0%, #0f0f13 100%); color: var(--text-main); font-family: var(--font-main); min-height: 100vh; width: 100vw; display: flex; justify-content: center; align-items: center; overflow-x: hidden; }
-        .hidden { display: none !important; }
-        .fade-in { animation: fadeIn 0.5s ease forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .glass-panel { background: var(--panel-bg); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); }
+        /* --- DESIGN SYSTEM PRESTIGE --- */
+        :root {
+            --bg-deep: #020205;
+            --sidebar-bg: rgba(10, 10, 14, 0.95);
+            --gold-grad: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7);
+            --gold-accent: #FFD700;
+            --neon-red: #ff2a2a;
+            --neon-blue: #2a8cff;
+            --neon-purple: #bd00ff;
+            --neon-green: #00ff9d;
+            --glass-panel: rgba(20, 20, 25, 0.75);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+            --glass-blur: blur(25px);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+        }
 
-        /* LOGIN */
-        #login-screen { width: 90%; max-width: 420px; padding: 40px; text-align: center; border-top: 4px solid var(--gold); }
-        .logo-icon { font-size: 3rem; margin-bottom: 10px; text-shadow: 0 0 20px var(--gold-glow); }
-        .error-msg { color: var(--danger); font-size: 0.9rem; margin: 10px 0; background: rgba(255, 77, 77, 0.1); padding: 5px; border-radius: 4px; }
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--bg-deep);
+            color: #e0e0e0;
+            margin: 0;
+            overflow: hidden;
+            letter-spacing: 0.5px;
+        }
 
-        /* DASHBOARD */
-        #dashboard-screen { width: 100%; max-width: 1200px; padding: 20px; text-align: center; }
-        .dashboard-header h1 { font-size: 2.5rem; color: var(--gold); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; }
-        .dashboard-header p { color: #ccc; font-size: 1.2rem; margin-bottom: 40px; }
-        .modules-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; justify-content: center; }
-        .module-card { padding: 40px 20px; text-align: center; cursor: pointer; transition: 0.3s; border-bottom: 4px solid transparent; position: relative; overflow: hidden; }
-        .module-card:hover { transform: translateY(-10px); border-bottom-color: var(--gold); background: rgba(255,255,255,0.05); }
-        .module-icon { font-size: 3.5rem; margin-bottom: 20px; display: block; }
-        .module-title { font-size: 1.4rem; font-weight: bold; color: #fff; text-transform: uppercase; }
-        .module-desc { font-size: 0.9rem; color: #888; margin-top: 10px; }
-        .module-disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
+        .bg-image {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(5, 5, 10, 0.8), rgba(30, 10, 40, 0.9)), url('https://images.unsplash.com/photo-1596561271387-951d8b7538a2?q=80&w=1920&auto=format&fit=crop') center/cover;
+            z-index: -1; filter: contrast(1.2);
+        }
 
-        /* APP */
-        #app-screen { width: 100%; max-width: 1400px; padding: 20px; margin: 0 auto; }
-        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; margin-bottom: 25px; }
-        .nav-left { display: flex; gap: 15px; align-items: center; }
-        .nav-home-btn { background: rgba(255,255,255,0.1); border: none; color: var(--gold); font-size: 1.2rem; padding: 8px 12px; border-radius: 8px; cursor: pointer; transition: 0.3s; }
-        .nav-home-btn:hover { background: var(--gold); color: #000; }
-        .badge-role { background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; color: var(--gold); }
-        .nav-user { display: flex; align-items: center; gap: 15px; }
-        .btn-logout { background: rgba(255,77,77,0.1); border: 1px solid rgba(255,77,77,0.3); color: var(--danger); padding: 8px 15px; border-radius: 8px; cursor: pointer; }
-        .btn-logout:hover { background: var(--danger); color: #fff; }
+        .brand-title, h1, h2, h3, h4, h5 {
+            font-family: 'Cinzel', serif; font-weight: 800; text-transform: uppercase; letter-spacing: 2px;
+            background: var(--gold-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));
+        }
+        .text-gold { color: var(--gold-accent) !important; text-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
+        .text-secondary { color: #aaa !important; font-weight: 500; letter-spacing: 1px; }
 
-        /* ELEMENTS COMMUNS */
-        .admin-section { padding: 25px; margin-bottom: 25px; border: 1px solid var(--gold); background: rgba(212, 175, 55, 0.05); }
-        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .stat-card { padding: 20px; text-align: center; border-bottom: 3px solid transparent; }
-        .stat-card.highlight-gold { border-bottom-color: var(--gold); }
-        .stat-card h3 { font-size: 1.6rem; margin-top: 5px; color: #fff; }
-        .money.gain { color: var(--success); }
-        .form-section { padding: 25px; margin-bottom: 25px; }
-        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
-        .input-group { margin-bottom: 15px; text-align: left; }
-        label { display: block; color: var(--text-muted); font-size: 0.75rem; margin-bottom: 6px; text-transform: uppercase; font-weight: 600; }
-        input, select { width: 100%; padding: 12px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: #fff; font-size: 1rem; }
-        input:focus, select:focus { border-color: var(--gold); box-shadow: 0 0 10px var(--gold-glow); }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 15px; align-items: end; }
-        .span-2 { grid-column: span 2; }
-        .span-full { grid-column: 1 / -1; margin-top: 10px; }
-        .btn-primary { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--gold), #b38f26); color: #000; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; text-transform: uppercase; }
-        .btn-primary:hover { transform: translateY(-2px); }
-        .btn-pdf { background: #fff; color: #000; font-weight: bold; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 5px; }
-        .btn-pdf:hover { background: #eee; transform: translateY(-2px); }
-        .toggles-wrapper { display: flex; gap: 20px; height: 48px; align-items: center; }
-        .toggle-control { display: flex; align-items: center; cursor: pointer; }
-        .toggle-control input { display: none; }
-        .toggle-control .control { width: 40px; height: 22px; background: rgba(255,255,255,0.1); border-radius: 20px; position: relative; margin-right: 10px; transition: 0.3s; }
-        .toggle-control .control::after { content:''; position: absolute; left: 2px; top: 2px; width: 18px; height: 18px; background: #fff; border-radius: 50%; transition: 0.3s; }
-        .toggle-control input:checked + .control { background: var(--gold); }
-        .toggle-control input:checked + .control::after { transform: translateX(18px); }
-        .toggle-control .label { font-size: 0.9rem; color: #ccc; }
-        .table-section { padding: 0; overflow: hidden; }
-        .table-header { padding: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-        .actions-header { display: flex; gap: 10px; align-items: center; }
-        .table-responsive { overflow-x: auto; width: 100%; }
-        table { width: 100%; border-collapse: collapse; min-width: 800px; }
-        th { text-align: left; padding: 15px; color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; }
-        .text-right { text-align: right; }
-        .text-center { text-align: center; }
-        .badge { padding: 4px 10px; border-radius: 50px; font-size: 0.7rem; font-weight: bold; }
-        .delete-btn { background: none; border: none; color: #666; cursor: pointer; padding: 5px; font-size: 1.1rem; }
-        .delete-btn:hover { color: var(--danger); }
-        @media (max-width: 900px) { .form-grid { grid-template-columns: 1fr; } .span-2 { grid-column: span 1; } .navbar { flex-direction: column; gap: 15px; align-items: flex-start; } .nav-brand, .nav-user { width: 100%; justify-content: space-between; } #app-screen { padding: 10px; } .table-header { flex-direction: column; align-items: stretch; } .actions-header { justify-content: space-between; } }
+        .glass-panel {
+            background: var(--glass-panel); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+            border: var(--glass-border); border-radius: 15px; box-shadow: var(--glass-shadow);
+            box-shadow: inset 0 1px 1px rgba(255,255,255,0.2); transition: all 0.3s ease;
+        }
+        .glass-panel:hover { border-color: rgba(255, 215, 0, 0.3); box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255,255,255,0.3); }
+
+        .sidebar {
+            position: fixed; top: 0; left: 0; height: 100vh; width: 260px;
+            background: var(--sidebar-bg); backdrop-filter: blur(30px); border-right: 1px solid rgba(255,215,0,0.1);
+            display: flex; flex-direction: column; z-index: 100; box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+        }
+
+        .brand-box { padding: 40px 20px; text-align: center; }
+        
+        .nav-item {
+            padding: 16px 30px; cursor: pointer; color: #888; transition: 0.4s;
+            display: flex; align-items: center; font-size: 1rem; font-weight: 600; position: relative; overflow: hidden;
+        }
+        .nav-item i { width: 30px; font-size: 1.2rem; transition: 0.3s; }
+        .nav-item:hover { color: #fff; background: rgba(255,255,255,0.03); }
+        .nav-item:hover i { transform: scale(1.1); color: var(--gold-accent); text-shadow: 0 0 10px var(--gold-accent); }
+        .nav-item.active {
+            color: var(--gold-accent); background: linear-gradient(90deg, rgba(255, 215, 0, 0.15), transparent);
+            border-left: 4px solid var(--gold-accent); box-shadow: inset 10px 0 20px -10px rgba(255, 215, 0, 0.5);
+        }
+
+        .user-profile { padding: 25px; background: rgba(0,0,0,0.3); border-top: 1px solid rgba(255,255,255,0.05); }
+        .main-content { margin-left: 260px; height: 100vh; overflow-y: auto; padding: 50px; }
+
+        .input-dc {
+            background: rgba(0,0,0,0.2); border: none; border-bottom: 2px solid rgba(255,255,255,0.2);
+            color: var(--gold-accent); font-family: 'Rajdhani', sans-serif; font-weight: 700; text-transform: uppercase;
+            text-align: center; padding: 10px; border-radius: 0; transition: 0.3s;
+        }
+        .input-dc:focus {
+            background: rgba(0,0,0,0.4); border-bottom-color: var(--gold-accent); outline: none; color: #fff;
+            box-shadow: 0 10px 20px -10px rgba(255, 215, 0, 0.3);
+        }
+        .form-select.input-dc { text-align: left; } 
+        .form-select.input-dc option { background-color: #111; color: white; }
+
+        .btn-gold {
+            background: var(--gold-grad); border: none; color: #1a1a1a; font-weight: 800; padding: 12px 25px;
+            border-radius: 50px; box-shadow: 0 5px 15px rgba(180, 135, 25, 0.4); transition: 0.3s; position: relative; overflow: hidden;
+        }
+        .btn-gold:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(180, 135, 25, 0.6); color: #000; }
+
+        .table-hover tbody tr:hover { background-color: rgba(255, 215, 0, 0.05) !important; box-shadow: inset 0 0 20px rgba(255, 215, 0, 0.1); }
+        .table thead th { border-bottom: 1px solid rgba(255, 215, 0, 0.2); color: #888; font-weight: 400; letter-spacing: 2px; padding-bottom: 15px; }
+        .table tbody td { border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding: 20px 10px; font-weight: 600; }
+
+        .dash-card {
+            padding: 25px; border-radius: 15px; text-align: center; background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; position: relative; overflow: hidden;
+        }
+        .dash-card:hover { transform: translateY(-5px); border-color: rgba(255,255,255,0.2); }
+        .dash-card::before { content:''; position:absolute; top:0; left:0; width:100%; height:4px; }
+        .dash-card.gold::before { background: var(--gold-accent); box-shadow: 0 0 10px var(--gold-accent); }
+        .dash-card.red::before { background: var(--neon-red); box-shadow: 0 0 10px var(--neon-red); }
+        .dash-card.blue::before { background: var(--neon-blue); box-shadow: 0 0 10px var(--neon-blue); }
+        .dash-card.purple::before { background: var(--neon-purple); box-shadow: 0 0 10px var(--neon-purple); }
+
+        .d-none { display: none !important; }
+        .badge-neon { background: rgba(0,0,0,0.3); border: 1px solid currentColor; box-shadow: 0 0 5px currentColor; padding: 5px 10px; border-radius: 30px; }
+
+        .form-check-input {
+            background-color: #333; border-color: #555; width: 3em; height: 1.5em; cursor: pointer;
+        }
+        .form-check-input:checked {
+            background-color: var(--neon-green); border-color: var(--neon-green);
+            box-shadow: 0 0 10px var(--neon-green);
+        }
+
+        .org-tree { display: flex; flex-direction: column; align-items: center; gap: 30px; }
+        .org-level { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; }
+        .org-card {
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1);
+            padding: 20px 30px; border-radius: 12px; min-width: 200px; text-align: center; transition: 0.3s; position: relative;
+        }
+        .org-card.boss { border: 1px solid var(--gold-accent); box-shadow: 0 0 25px rgba(255, 215, 0, 0.3), inset 0 0 10px rgba(255,215,0,0.2); }
+        .org-card.boss::after { content: '👑'; position: absolute; top:-15px; left: 50%; transform: translateX(-50%); font-size: 1.5rem; }
     </style>
 </head>
 <body>
 
-<div class="bg-animation"></div>
+<div class="bg-image"></div>
 
-<div id="login-screen" class="glass-panel fade-in">
-    <div class="login-header">
-        <div class="logo-icon">⚖️</div>
-        <h2>Dawson & Partners</h2>
-        <p>Connexion Intranet</p>
-    </div>
-    <div class="input-group">
-        <label>Identifiant</label>
-        <input type="text" id="loginUser" placeholder="Nom Prénom">
-    </div>
-    <div class="input-group">
-        <label>Mot de passe</label>
-        <input type="password" id="loginPass" placeholder="••••••">
-    </div>
-    <p id="loginError" class="error-msg hidden">⛔ Erreur connexion (Vérifie la console)</p>
-    <button class="btn-primary" id="btnLogin">Se Connecter</button>
-</div>
-
-<div id="dashboard-screen" class="hidden">
-    <div class="dashboard-header">
-        <div class="logo-icon">⚖️</div>
-        <h1 id="welcomeTitle">Bienvenue...</h1>
-        <p>Veuillez sélectionner une application</p>
-    </div>
-
-    <div class="modules-grid">
-        <div class="module-card glass-panel" onclick="window.ouvrirApp('commis')">
-            <span class="module-icon">💼</span>
-            <div class="module-title">Commis d'Office</div>
-            <div class="module-desc">Gestion des dossiers</div>
+<div id="screen-login" class="d-flex align-items-center justify-content-center vh-100" style="position:fixed; width:100%; z-index:9999; background: radial-gradient(circle at center, rgba(20,20,30,0.8), #000);">
+    <div class="glass-panel p-5 text-center" style="width: 500px; border-top: none; box-shadow: 0 0 100px rgba(255, 215, 0, 0.15);">
+        <div class="mb-5">
+            <h1 class="brand-title mb-3" style="font-size: 4rem;">DIAMOND</h1>
+            <div style="height: 2px; width: 100px; background: var(--gold-grad); margin: 0 auto 20px;"></div>
+            <p class="text-secondary" style="letter-spacing: 6px;">Casino</p>
         </div>
-        <div class="module-card glass-panel module-disabled">
-            <span class="module-icon">💸</span>
-            <div class="module-title">Facturation</div>
-            <div class="module-desc">Bientôt</div>
-        </div>
-        <div class="module-card glass-panel module-disabled">
-            <span class="module-icon">📖</span>
-            <div class="module-title">Annuaire</div>
-            <div class="module-desc">Bientôt</div>
-        </div>
-    </div>
-    <div style="margin-top: 50px;">
-        <button class="btn-logout" onclick="location.reload()">Déconnexion</button>
+        <form onsubmit="event.preventDefault(); login();">
+            <input type="text" class="form-control input-dc mb-5" style="font-size: 1.2rem;" placeholder="IDENTIFIANT" value="Sabri">
+            <button class="btn btn-gold w-100 py-3 fs-5">TABLEAU DE BORD</button>
+        </form>
     </div>
 </div>
 
-<div id="app-screen" class="hidden">
-    <nav class="navbar glass-panel">
-        <div class="nav-left">
-            <button class="nav-home-btn" onclick="window.retourDashboard()" title="Retour au Menu">🏠</button>
-            <div class="nav-brand">
-                <span class="logo">⚖️</span>
-                <div class="brand-text">
-                    <h1>Gestion Commis</h1>
-                    <span id="roleBadge" class="badge-role">...</span>
+<div id="app-layout" class="d-none">
+    
+    <nav class="sidebar">
+        <div class="brand-box">
+            <div class="brand-title fs-3">DIAMOND</div>
+            <div class="text-gold small" style="letter-spacing: 3px; opacity: 0.7;">Gestion</div>
+        </div>
+        <div class="nav-links mt-4">
+            <div class="nav-item active" onclick="navTo('view-dashboard', this)"><i class="fa-solid fa-chart-pie"></i> ACCUEIL</div>
+            <div class="nav-item" onclick="navTo('view-runs', this)"><i class="fa-solid fa-truck-fast"></i> LOGISTIQUE</div>
+            <div class="nav-item" onclick="navTo('view-sales', this)"><i class="fa-solid fa-martini-glass-citrus"></i> VENTES</div>
+            <div class="nav-item" onclick="navTo('view-staff', this)"><i class="fa-solid fa-users"></i> STAFF & RH</div>
+            <div class="nav-item" onclick="navTo('view-bills', this)"><i class="fa-solid fa-file-invoice-dollar"></i> TRÉSORERIE</div>
+            <div class="nav-item" onclick="navTo('view-org', this)"><i class="fa-solid fa-sitemap"></i> ORGANIGRAMME</div>
+            <div class="nav-item" onclick="navTo('view-pay', this)" style="margin-top:20px; border-top:1px solid rgba(255,255,255,0.05)"><i class="fa-solid fa-money-bill-wave" style="color:var(--neon-green)"></i> SALAIRES</div>
+        </div>
+        <div class="user-profile">
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center">
+                    <div style="width: 40px; height: 40px; background: var(--gold-grad); border-radius: 50%; display:flex; align-items:center; justify-content:center; font-weight:bold; color:black; margin-right: 15px;">S</div>
+                    <div>
+                        <div class="text-white fw-bold">SABRI</div>
+                        <div class="small" style="color: var(--gold-accent);">● PDG</div>
+                    </div>
                 </div>
-            </div>
-        </div>
-        <div class="nav-user">
-            <div class="user-details">
-                <span class="welcome-label">Utilisateur</span>
-                <span id="displayUser" class="user-name">...</span>
+                <button onclick="location.reload()" class="btn btn-sm btn-outline-danger rounded-circle" style="width:35px; height:35px;"><i class="fa-solid fa-power-off"></i></button>
             </div>
         </div>
     </nav>
 
     <div class="main-content">
-        <div id="adminPanel" class="admin-section glass-panel hidden">
-            <div class="section-header"><h3>👑 Créer un Profil</h3></div>
-            <div class="form-grid">
-                <div class="input-group"><label>Nom</label><input type="text" id="newUserName" placeholder="Prénom Nom"></div>
-                <div class="input-group"><label>Mdp</label><input type="text" id="newUserPass"></div>
-                <div class="input-group"><label>Grade</label>
-                    <select id="newUserGrade">
-                        <option value="0.75">Président (75%)</option>
-                        <option value="0.65">Partenaire Directeur (65%)</option>
-                        <option value="0.60">Partenaire Sénior (60%)</option>
-                        <option value="0.55">Partenaire (55%)</option>
-                        <option value="0.50">Partenaire Junior (50%)</option>
-                        <option value="0.40">Avocat Sénior (40%)</option>
-                        <option value="0.35" selected>Avocat (35%)</option>
-                        <option value="0.30">Avocat Junior (30%)</option>
-                        <option value="0">Parajuriste (0%)</option>
-                        <option value="0">Assistant Juridique (0%)</option>
-                    </select>
-                </div>
-                <button class="btn-primary" id="btnCreateUser">Créer</button>
+        
+        <div id="view-dashboard">
+            <h3 class="text-white mb-5">VUE <span class="text-gold">FINANCIÈRE</span></h3>
+            
+            <div class="glass-panel p-4 mb-5 text-center position-relative overflow-hidden">
+                <div style="position: absolute; top:0; left:0; width:100%; height:4px; background: var(--gold-grad); box-shadow: 0 0 15px var(--gold-accent);"></div>
+                <h5 class="text-secondary mb-2" style="letter-spacing: 3px;">CHIFFRE D'AFFAIRES GLOBAL</h5>
+                <h1 class="display-3 fw-bold text-gold" id="dash-ca">$ 0</h1>
             </div>
-            <hr style="border:0; border-top:1px solid #d4af37; margin:20px 0;">
-             <div class="section-header"><h3>✏️ Modifier Grade</h3></div>
-            <div class="form-grid">
-                <div class="input-group span-2"><label>Employé</label><select id="editUserSelect"><option>Chargement...</option></select></div>
-                <div class="input-group"><label>Nouveau Grade</label><select id="editUserGrade">
-                        <option value="0.75">Président (75%)</option>
-                        <option value="0.65">Partenaire Directeur (65%)</option>
-                        <option value="0.60">Partenaire Sénior (60%)</option>
-                        <option value="0.55">Partenaire (55%)</option>
-                        <option value="0.50">Partenaire Junior (50%)</option>
-                        <option value="0.40">Avocat Sénior (40%)</option>
-                        <option value="0.35" selected>Avocat (35%)</option>
-                        <option value="0.30">Avocat Junior (30%)</option>
-                        <option value="0">Parajuriste (0%)</option>
-                        <option value="0">Assistant Juridique (0%)</option>
-                </select></div>
-                <button class="btn-primary" id="btnEditUser">Modifier</button>
+
+            <div class="row g-4 mb-5">
+                <div class="col-md-3">
+                    <div class="dash-card purple">
+                        <div class="text-secondary small mb-2">TOTAL SALAIRES</div>
+                        <div class="fs-4 fw-bold" style="color:var(--neon-purple)" id="dash-salaries">$ 0</div>
+                    </div>
+                </div>
+                 <div class="col-md-3">
+                    <div class="dash-card blue">
+                        <div class="text-secondary small mb-2">CHARGES EXT.</div>
+                        <div class="fs-4 fw-bold" style="color:var(--neon-blue)" id="dash-charges">$ 0</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="dash-card gold">
+                        <div class="text-secondary small mb-2">BÉNÉFICE IMPOSABLE</div>
+                        <div class="fs-4 fw-bold text-white" id="dash-brut">$ 0</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="dash-card red">
+                        <div class="text-secondary small mb-2">TAXE SEC (30%)</div>
+                        <div class="fs-4 fw-bold" style="color: var(--neon-red);" id="dash-tax">$ 0</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-panel p-5 text-center position-relative overflow-hidden" style="border-top: none;">
+                <div style="position: absolute; top:-50%; left:-50%; width:200%; height:200%; background: radial-gradient(circle, rgba(255,215,0,0.15) 0%, transparent 60%); z-index:-1;"></div>
+                <h5 class="text-secondary mb-3" style="letter-spacing: 3px;">SOLDE NET RÉEL (POCHE PATRON)</h5>
+                <h1 class="display-2 fw-bold" style="color: var(--neon-green); text-shadow: 0 0 30px rgba(0,255,157,0.5);" id="dash-net">$ 0</h1>
             </div>
         </div>
 
-        <div class="stats-row">
-            <div class="stat-card glass-panel"><span>Total Cabinet</span><h3 id="totalEtat" class="money">0 $</h3></div>
-            <div class="stat-card glass-panel highlight-gold"><span id="labelTotalGain">Vos Commissions</span><h3 id="totalGain" class="money gain">0 $</h3></div>
-            <div class="stat-card glass-panel"><span>Amendes</span><h3 id="totalAmendes" class="money">0 $</h3></div>
-        </div>
-
-        <div class="form-section glass-panel">
-            <div class="section-header"><h3>Nouveau Dossier (+150k)</h3></div>
-            <div class="form-grid">
-                <div class="input-group"><label>Client</label><input type="text" id="client"></div>
-                <div class="input-group span-2"><label>Charges</label><input type="text" id="charges"></div>
-                <div class="input-group"><label>Grade</label><input type="text" id="displayGrade" disabled style="opacity:0.6"></div>
-                <div class="input-group"><label>Amende</label><input type="number" id="amende"></div>
-                <div class="toggles-wrapper">
-                    <label class="toggle-control"><input type="checkbox" id="proces"><span class="control"></span><span class="label">Procès</span></label>
-                    <label class="toggle-control"><input type="checkbox" id="accord"><span class="control"></span><span class="label">Accord</span></label>
-                </div>
-                <button class="btn-primary span-full" id="btnAddCase">Enregistrer</button>
-            </div>
-        </div>
-
-        <div class="table-section glass-panel">
-            <div class="table-header">
-                <h3>Historique</h3>
-                <div class="actions-header">
-                    <button class="btn-pdf" onclick="window.exporterPDF()">📄 PDF</button>
-                    <div class="search-box"><input type="text" id="search" placeholder="Recherche..." onkeyup="window.renderTable()"></div>
-                </div>
-            </div>
-            <div class="table-responsive">
-                <table>
-                    <thead><tr><th>Avocat</th><th>Client</th><th>Charges</th><th>Amende</th><th>Procès</th><th>Accord</th><th>Facture</th><th>Com</th><th></th></tr></thead>
-                    <tbody id="listeDossiers"></tbody>
+        <div id="view-runs" class="d-none">
+            <h3 class="text-white mb-5">LOGISTIQUE <span class="text-gold">RUNS</span></h3>
+            <div class="glass-panel p-4" style="border-top: none;">
+                <table class="table table-dark table-hover align-middle text-center">
+                    <thead>
+                        <tr>
+                            <th>NOM</th>
+                            <th>NB RUNS</th>
+                            <th>TAUX %</th>
+                            <th>VALEUR RUN (96k)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="list-runs"></tbody>
                 </table>
             </div>
         </div>
+
+        <div id="view-sales" class="d-none">
+            <h3 class="text-white mb-5">VENTES <span class="text-gold">DIRECTES</span></h3>
+            <div class="glass-panel p-4" style="border-top: none;">
+                <table class="table table-dark table-hover align-middle text-center">
+                    <thead>
+                        <tr>
+                            <th>NOM</th>
+                            <th>GRADE</th>
+                            <th>TOTAL VENTES ($)</th>
+                            <th>AJOUTER FACTURE</th>
+                            <th>COM.</th>
+                        </tr>
+                    </thead>
+                    <tbody id="list-sales"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="view-staff" class="d-none">
+            <h3 class="text-white mb-5">RESSOURCES <span class="text-gold">HUMAINES</span></h3>
+            <div class="row g-5">
+                <div class="col-md-4">
+                    <div class="glass-panel p-4" style="border-top: 3px solid var(--gold-accent);">
+                        <h5 class="text-gold mb-4">RECRUTEMENT</h5>
+                        <div class="mb-4"><label class="text-secondary small mb-2">IDENTITÉ</label><input type="text" id="newName" class="form-control input-dc" placeholder="NOM RP"></div>
+                        <div class="mb-4"><label class="text-secondary small mb-2">POSTE</label><select id="newRole" class="form-select input-dc text-start ps-3" style="cursor: pointer;" onchange="updateForm()"><option value="emp">EMPLOYÉ</option><option value="co">CO-PATRON</option></select></div>
+                        <div class="mb-5">
+                            <label class="text-secondary small mb-2">POURCENTAGE CONTRAT</label>
+                            <select id="newGrade" class="form-select input-dc text-start ps-3" style="cursor: pointer;"><option value="0.30">DÉBUTANT (30%)</option><option value="0.45">CONFIRMÉ (45%)</option><option value="0.60">EXPERT (60%)</option><option value="0.75" disabled id="opt-co">CO-PATRON (75%)</option></select>
+                        </div>
+                        <button onclick="addEmp()" class="btn btn-gold w-100 py-3">VALIDER L'EMBAUCHE</button>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="glass-panel p-4" style="border-top: none;">
+                        <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-secondary"><h5 class="text-white m-0">EFFECTIF ACTIF</h5><button onclick="resetWeek()" class="btn btn-outline-danger px-4 rounded-pill fw-bold">RESET SEMAINE</button></div>
+                        <table class="table table-dark align-middle"><tbody id="list-staff"></tbody></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-bills" class="d-none">
+            <h3 class="text-white mb-5">DÉPENSES & <span style="color:var(--neon-blue)">FACTURES</span></h3>
+            <div class="glass-panel p-5" style="border-top: 3px solid var(--neon-blue);">
+                <div class="row mb-5 align-items-end g-3">
+                    <div class="col-md-6"><label class="text-secondary small mb-2">MOTIF</label><input type="text" id="billName" class="form-control input-dc text-start ps-4" placeholder="Ex: Gruppe 6"></div>
+                    <div class="col-md-4"><label class="text-secondary small mb-2">MONTANT</label><input type="number" id="billAmount" class="form-control input-dc" placeholder="$"></div>
+                    <div class="col-md-2"><button onclick="addBill()" class="btn btn-primary w-100 py-3 fw-bold rounded-pill" style="background:var(--neon-blue); border:none;">PAYER</button></div>
+                </div>
+                <table class="table table-dark align-middle"><tbody id="list-bills"></tbody></table>
+            </div>
+        </div>
+
+        <div id="view-org" class="d-none">
+            <h3 class="text-white mb-5 text-center">ORGANIGRAMME</h3>
+            <div class="glass-panel p-5 text-center" style="min-height: 70vh; border-top: none; background: radial-gradient(circle at center, rgba(189, 0, 255, 0.05), transparent);"><div id="org-tree" class="org-tree"></div></div>
+        </div>
+
+        <div id="view-pay" class="d-none">
+            <h3 class="text-white mb-5">BULLETINS DE <span style="color:var(--neon-green)">PAIE</span></h3>
+            <div class="glass-panel p-4" style="border-top: 3px solid var(--neon-green);">
+                <table class="table table-dark table-hover align-middle text-center mb-5">
+                    <thead><tr><th class="text-start ps-4">EMPLOYÉ</th><th>PRIME FIXE</th><th>VERSER PRIME ?</th><th>COM. RUNS</th><th>COM. VENTES</th><th class="text-end pe-4">TOTAL À PAYER</th></tr></thead>
+                    <tbody id="list-pay"></tbody>
+                </table>
+                <div class="p-4 rounded text-center" style="background: rgba(0,255,157,0.05); border: 1px solid var(--neon-green);">
+                    <h5 class="text-secondary mb-2">TOTAL LIQUIDE À SORTIR DE LA BANQUE</h5>
+                    <h1 class="fw-bold" style="color:var(--neon-green)" id="total-cashout">$ 0</h1>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+<script>
+    const RUN_PRICE = 96000;
+    const TAX_RATE = 0.30;
+    
+    const ROLES = {
+        'boss': { label: 'PDG', fix: 1000000, color: 'var(--gold-accent)', neon: 'var(--gold-accent)', saleRate: 0.85, maxRun: 80 },
+        'co':   { label: 'CO-PDG', fix: 500000, color: '#fff', neon: 'var(--neon-purple)', saleRate: 0.75, maxRun: 70 },
+        'emp':  { label: 'STAFF', fix: 0, color: '#888', neon: 'var(--neon-blue)', maxRun: 0 }
+    };
 
-    const firebaseConfig = {
-  apiKey: "AIzaSyAFJWLubNJiWIys9yHmtY--9QtDZ4hsbY0",
-  authDomain: "dawson-cabinet.firebaseapp.com",
-  projectId: "dawson-cabinet",
-  storageBucket: "dawson-cabinet.firebasestorage.app",
-  messagingSenderId: "660518713250",
-  appId: "1:660518713250:web:a00a8c615d08868ab264fb",
-  measurementId: "G-QJPKCGYCBT"
-};
+    let dbEmp = [
+        { id: 1, nom: "Sabri", role: "boss", saleRate: 0.85, runRate: 80, runs: 0, ventes: 0, primeActive: true },
+        { id: 2, nom: "Max", role: "co", saleRate: 0.75, runRate: 70, runs: 0, ventes: 0, primeActive: true }
+    ];
+    let dbBills = [];
 
-    let app, db;
-    try {
-        app = initializeApp(firebaseConfig);
-        db = getFirestore(app);
-        console.log("Firebase OK");
-    } catch(e) {
-        console.error("Erreur Config:", e);
+    function login() {
+        document.getElementById('screen-login').style.opacity = '0';
+        setTimeout(() => { document.getElementById('screen-login').classList.add('d-none'); document.getElementById('app-layout').classList.remove('d-none'); renderAll(); }, 500);
+    }
+    function navTo(v, e) {
+        document.querySelectorAll('[id^="view-"]').forEach(el => el.classList.add('d-none')); document.getElementById(v).classList.remove('d-none');
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active')); e.classList.add('active'); renderAll();
+    }
+    
+    function updateForm() {
+        let r = document.getElementById("newRole").value; let g = document.getElementById("newGrade");
+        if(r==='co') { g.value="0.75"; g.disabled=true; document.getElementById("opt-co").disabled=false; } 
+        else { g.value="0.30"; g.disabled=false; document.getElementById("opt-co").disabled=true; }
     }
 
-    const PRIX_COMMIS = 150000;
-    let currentUser = null;
-    let globalUsers = [];
-    let globalDossiers = [];
-
-    if(db) {
-        onSnapshot(query(collection(db, "users")), (snapshot) => {
-            globalUsers = [];
-            snapshot.forEach((doc) => globalUsers.push({ id: doc.id, ...doc.data() }));
-        });
-
-        onSnapshot(query(collection(db, "dossiers")), (snapshot) => {
-            globalDossiers = [];
-            snapshot.forEach((doc) => globalDossiers.push({ id: doc.id, ...doc.data() }));
-            if(currentUser) window.renderTable();
-        });
+    function addEmp() {
+        let n = document.getElementById("newName").value; let r = document.getElementById("newRole").value; let gVal = parseFloat(document.getElementById("newGrade").value);
+        let sRate = gVal; let rRate = gVal * 100;
+        if(r==='co') { sRate = 0.75; rRate = 70; }
+        if(n) { dbEmp.push({ id: Date.now(), nom: n, role: r, saleRate: sRate, runRate: rRate, runs: 0, ventes: 0, primeActive: true }); document.getElementById("newName").value = ""; renderAll(); }
     }
 
-    function checkIsAdmin() {
-        if (!currentUser) return false;
-        const nom = currentUser.name.toLowerCase();
-        return nom.includes('dawson') || nom.includes('mariani') || currentUser.pass === "999000";
+    function addBill() {
+        let m = document.getElementById("billName").value; let v = parseFloat(document.getElementById("billAmount").value);
+        if(m && v) { dbBills.push({id: Date.now(), motif: m, val: v}); document.getElementById("billName").value=""; document.getElementById("billAmount").value=""; renderAll(); }
     }
 
-    document.getElementById('btnLogin').addEventListener('click', () => {
-        const u = document.getElementById('loginUser').value.trim();
-        const p = document.getElementById('loginPass').value.trim();
-        
-        if (p === "999000") {
-            currentUser = { id: "god_mode", name: u || "Super Admin", pass: "999000", grade: 1.0, role: "Président (Test)" };
-            lancerConnexionReussie();
+    function updateVal(id, t, v) { 
+        let e = dbEmp.find(x => x.id == id); 
+        if(e) { 
+            if(t === 'runRate') {
+                let max = ROLES[e.role].maxRun;
+                if(max > 0 && v > max) v = max;
+                if(v < 0) v = 0;
+            }
+            e[t] = parseInt(v)||0; 
+            renderAll(); 
         } 
-        else {
-            const found = globalUsers.find(user => user.name.toLowerCase() === u.toLowerCase() && user.pass === p);
-            if(found) {
-                currentUser = found;
-                lancerConnexionReussie();
+    }
+
+    // NOUVELLE FONCTION POUR AJOUTER UNE VENTE
+    function pushSale(id) {
+        let input = document.getElementById('input-sale-' + id);
+        let amount = parseFloat(input.value);
+        if(amount) {
+            let e = dbEmp.find(x => x.id == id);
+            if(e) {
+                e.ventes += amount;
+                input.value = "";
+                renderAll();
+            }
+        }
+    }
+    
+    function togglePrime(id) { let e = dbEmp.find(x => x.id == id); if(e) { e.primeActive = !e.primeActive; renderAll(); } }
+    function del(id, t) { if(confirm("Supprimer ?")) { if(t=='emp') dbEmp = dbEmp.filter(x => x.id != id); if(t=='bill') dbBills = dbBills.filter(x => x.id != id); renderAll(); } }
+    function resetWeek() { if(confirm("Nouvelle Semaine ?")) { dbEmp.forEach(e => { e.runs=0; e.ventes=0; e.primeActive=true; }); dbBills = []; renderAll(); } }
+
+    function renderAll() {
+        let tCA=0, tSalVar=0, tBills=0, tFix=0;
+        let hR="", hS="", hSt="", hB="", hP="";
+
+        dbEmp.forEach(e => {
+            let ca = (e.runs*RUN_PRICE) + e.ventes;
+            let salFixBase = ROLES[e.role].fix;
+            let salFixReel = (salFixBase > 0 && e.primeActive) ? salFixBase : 0;
+
+            let comRun = (e.runs*RUN_PRICE) * (e.runRate / 100);
+            let comVente = e.ventes * e.saleRate;
+            let totalPerso = comRun + comVente + salFixReel;
+
+            tCA += ca; tSalVar += (comRun + comVente); tFix += salFixReel;
+
+            // HTML LOGISTIQUE RUNS
+            let inputRate = "";
+            if(e.role === 'boss' || e.role === 'co') {
+                inputRate = `<input type="number" class="input-dc mx-auto" style="width:70px;padding:5px; color:${ROLES[e.role].color}" value="${e.runRate}" onchange="updateVal(${e.id},'runRate',this.value)">`;
             } else {
-                document.getElementById('loginError').classList.remove('hidden');
+                inputRate = `<span class="badge-neon" style="color:${ROLES[e.role].color}">${e.runRate}%</span>`;
             }
-        }
-    });
-
-    function lancerConnexionReussie() {
-        document.getElementById('login-screen').classList.add('hidden');
-        document.getElementById('dashboard-screen').classList.remove('hidden');
-        document.getElementById('dashboard-screen').classList.add('fade-in');
-        const displayName = currentUser.name.split(' ').pop();
-        document.getElementById('welcomeTitle').innerText = `Bienvenue Maître ${displayName}`;
-    }
-
-    window.ouvrirApp = (module) => {
-        if(module === 'commis') {
-            document.getElementById('dashboard-screen').classList.add('hidden');
-            lancerAppCommis();
-        }
-    };
-
-    window.retourDashboard = () => {
-        document.getElementById('app-screen').classList.add('hidden');
-        document.getElementById('dashboard-screen').classList.remove('hidden');
-        document.body.style.alignItems = 'center';
-    };
-
-    function lancerAppCommis() {
-        document.getElementById('app-screen').classList.remove('hidden');
-        document.getElementById('app-screen').classList.add('fade-in');
-        document.body.style.alignItems = 'flex-start';
-        document.getElementById('displayUser').innerText = currentUser.name;
-        document.getElementById('roleBadge').innerText = currentUser.role.toUpperCase();
-        document.getElementById('displayGrade').value = `${currentUser.role} (${(currentUser.grade * 100).toFixed(0)}%)`;
-        
-        if(checkIsAdmin()) {
-            document.getElementById('adminPanel').classList.remove('hidden');
-            chargerSelectEmployes();
-        } else {
-            document.getElementById('adminPanel').classList.add('hidden');
-        }
-        window.renderTable();
-    }
-
-   // --- REMPLACEMENT DU BLOC CRÉATION UTILISATEUR ---
-document.getElementById('btnCreateUser').addEventListener('click', async () => {
-    const name = document.getElementById('newUserName').value;
-    const pass = document.getElementById('newUserPass').value;
-    const sel = document.getElementById('newUserGrade');
-    const grade = parseFloat(sel.value);
-    const role = sel.options[sel.selectedIndex].text.split('(')[0].trim();
-
-    if(name && pass) {
-        try {
-            console.log("Tentative de création de :", name); // Pour le débug
+            hR += `<tr><td class="fw-bold">${e.nom}</td><td><input type="number" class="input-dc mx-auto" style="width:80px;padding:5px;" value="${e.runs}" onchange="updateVal(${e.id},'runs',this.value)"></td><td>${inputRate}</td><td class="text-gold fw-bold">$ ${(e.runs*RUN_PRICE).toLocaleString()}</td></tr>`;
             
-            await addDoc(collection(db, "users"), { 
-                name: name, 
-                pass: pass, 
-                grade: grade, 
-                role: role 
-            });
-            
-            alert(`✅ Succès ! L'avocat ${name} a été créé.`);
-            // On vide les champs
-            document.getElementById('newUserName').value = "";
-            document.getElementById('newUserPass').value = "";
-            
-        } catch (error) {
-            console.error("Erreur Firebase :", error);
-            alert("❌ ERREUR : " + error.message + "\n\n(Vérifie que tes règles Firestore sont en 'allow read, write: if true')");
-        }
-    } else {
-        alert("⚠️ Il faut mettre un Nom et un Mot de passe !");
-    }
-});
-
-    document.getElementById('btnEditUser').addEventListener('click', async () => {
-        const userId = document.getElementById('editUserSelect').value;
-        const newGrade = parseFloat(document.getElementById('editUserGrade').value);
-        const sel = document.getElementById('editUserGrade');
-        const newRole = sel.options[sel.selectedIndex].text.split('(')[0].trim();
-        if(userId) {
-            await updateDoc(doc(db, "users", userId), { grade: newGrade, role: newRole });
-            alert("Mis à jour !");
-        }
-    });
-
-    function chargerSelectEmployes() {
-        const sel = document.getElementById('editUserSelect');
-        sel.innerHTML = "";
-        globalUsers.sort((a,b) => a.name.localeCompare(b.name)).forEach(u => {
-            const opt = document.createElement('option');
-            opt.value = u.id;
-            opt.innerText = `${u.name} (${u.role})`;
-            sel.appendChild(opt);
-        });
-    }
-
-    document.getElementById('btnAddCase').addEventListener('click', async () => {
-        const client = document.getElementById('client').value;
-        const charges = document.getElementById('charges').value;
-        const amende = parseFloat(document.getElementById('amende').value) || 0;
-        const proces = document.getElementById('proces').checked;
-        const accord = document.getElementById('accord').checked;
-        if(client) {
-            const maPart = PRIX_COMMIS * currentUser.grade;
-            await addDoc(collection(db, "dossiers"), {
-                timestamp: Date.now(), auteur: currentUser.name, client, charges, amende, proces, accord, factureEtat: PRIX_COMMIS, gainAvocat: maPart
-            });
-            document.getElementById('client').value = "";
-        }
-    });
-
-    window.supprimerDossier = async (id, auteur) => {
-        if(currentUser.name === auteur || checkIsAdmin()) {
-            if(confirm("Supprimer ce dossier définitivement ?")) {
-                await deleteDoc(doc(db, "dossiers", id));
-            }
-        } else { 
-            alert("Action refusée : Vous n'avez pas les droits sur ce dossier."); 
-        }
-    };
-
-    window.renderTable = () => {
-        const tbody = document.getElementById('listeDossiers');
-        const search = document.getElementById('search').value.toLowerCase();
-        tbody.innerHTML = "";
-        let sumEtat = 0, sumGain = 0, sumAmendes = 0;
-        let list = [...globalDossiers].sort((a,b) => b.timestamp - a.timestamp);
-        if(search) list = list.filter(d => d.client.toLowerCase().includes(search));
-        
-        const isAdmin = checkIsAdmin();
-
-        list.forEach(d => {
-            sumEtat += d.factureEtat; sumAmendes += d.amende;
-            if(d.auteur === currentUser.name) sumGain += d.gainAvocat;
-            const isMe = d.auteur === currentUser.name;
-            const btnDel = (isMe || isAdmin) ? `<button class="delete-btn" onclick="supprimerDossier('${d.id}', '${d.auteur}')">×</button>` : '';
-            const styleUser = isMe ? "color:#fff; font-weight:bold" : "color:#888";
-            
-            tbody.innerHTML += `<tr>
-                <td style="${styleUser}">${d.auteur}</td>
-                <td style="color:#d4af37; font-weight:600">${d.client}</td>
-                <td style="color:#aaa; font-size:0.9em">${d.charges}</td>
-                <td style="font-family:monospace">${formater(d.amende)}</td>
-                <td class="text-center">${d.proces ? '✅' : '❌'}</td>
-                <td class="text-center">${d.accord ? '✅' : '❌'}</td>
-                <td class="text-right" style="color:#aaa">${formater(d.factureEtat)}</td>
-                <td class="text-right" style="color:#00e676; font-weight:bold">${isMe ? '+ '+formater(d.gainAvocat) : '-'}</td>
-                <td class="text-center">${btnDel}</td>
+            // HTML VENTES (CAISSE ENREGISTREUSE)
+            hS += `<tr>
+                <td class="fw-bold">${e.nom}</td>
+                <td><span class="badge-neon" style="color:${ROLES[e.role].color}">${(e.saleRate*100)}%</span></td>
+                <td><input type="number" class="input-dc mx-auto" style="width:120px;padding:5px;" value="${e.ventes}" onchange="updateVal(${e.id},'ventes',this.value)"></td>
+                <td>
+                    <div class="input-group justify-content-center" style="max-width:200px; margin:auto;">
+                        <input id="input-sale-${e.id}" type="number" class="form-control input-dc" placeholder="+ $$" onkeydown="if(event.key==='Enter') pushSale(${e.id})">
+                        <button class="btn btn-outline-light" onclick="pushSale(${e.id})"><i class="fa-solid fa-plus"></i></button>
+                    </div>
+                </td>
+                <td class="text-gold fw-bold">$ ${(comVente).toLocaleString()}</td>
             </tr>`;
+            
+            let btnDel = (e.role === 'boss' || e.role === 'co') ? '' : `<button onclick="del(${e.id},'emp')" class="btn btn-sm btn-outline-danger rounded-circle" style="width:30px;height:30px;padding:0;"><i class="fa-solid fa-xmark"></i></button>`;
+            hSt += `<tr><td><span class="fw-bold text-white fs-5">${e.nom}</span> <span class="badge-neon ms-2" style="color:${ROLES[e.role].color}">${ROLES[e.role].label}</span></td><td class="text-end"><span class="fw-bold text-white">$ ${(totalPerso).toLocaleString()}</span></td><td class="text-end">${btnDel}</td></tr>`;
+            
+            let toggleHTML = "-";
+            if(salFixBase > 0) {
+                let isChecked = e.primeActive ? "checked" : "";
+                toggleHTML = `<div class="form-check form-switch d-flex justify-content-center"><input class="form-check-input" type="checkbox" ${isChecked} onchange="togglePrime(${e.id})"></div>`;
+            }
+
+            let styleFix = salFixReel > 0 ? "text-white fw-bold" : "text-secondary text-decoration-line-through";
+            
+            hP += `<tr><td class="text-start ps-4 fw-bold text-white">${e.nom}</td><td><span class="${styleFix}">$ ${salFixBase.toLocaleString()}</span></td><td>${toggleHTML}</td><td><span class="text-gold">$ ${comRun.toLocaleString()}</span></td><td><span class="text-gold">$ ${comVente.toLocaleString()}</span></td><td class="text-end pe-4 fw-bold" style="color:var(--neon-green); font-size:1.2rem;">$ ${totalPerso.toLocaleString()}</td></tr>`;
         });
-        document.getElementById('totalEtat').innerText = formater(sumEtat);
-        document.getElementById('totalGain').innerText = formater(sumGain);
-        document.getElementById('totalAmendes').innerText = formater(sumAmendes);
-    };
 
-    function formater(n) { return new Intl.NumberFormat('en-US').format(n).replace(/,/g, ' ') + ' $'; }
+        dbBills.forEach(b => { tBills += b.val; hB += `<tr><td class="fw-bold text-white fs-5">${b.motif}</td><td class="text-end fw-bold" style="color:var(--neon-blue);">$ ${b.val.toLocaleString()}</td><td class="text-end"><button onclick="del(${b.id},'bill')" class="btn btn-sm btn-outline-light rounded-circle" style="width:30px;height:30px;padding:0;opacity:0.5;"><i class="fa-solid fa-xmark"></i></button></td></tr>`; });
 
-    window.exporterPDF = () => {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        doc.text("RAPPORT CABINET DAWSON", 14, 20);
-        const data = globalDossiers.map(d => [d.auteur, d.client, d.charges, d.amende, d.proces?'O':'N', d.accord?'O':'N', d.factureEtat, d.gainAvocat]);
-        doc.autoTable({ startY: 30, head: [['Avocat', 'Client', 'Charges', 'Amende', 'P', 'A', 'Total', 'Com']], body: data });
-        doc.save("Rapport.pdf");
-    };
+        let totalCharges = tSalVar + tFix + tBills;
+        let beneficeImposable = tCA - totalCharges;
+        let taxe = (beneficeImposable > 0) ? beneficeImposable * TAX_RATE : 0;
+        let net = beneficeImposable - taxe;
+
+        document.getElementById("list-runs").innerHTML = hR;
+        document.getElementById("list-sales").innerHTML = hS;
+        document.getElementById("list-staff").innerHTML = hSt;
+        document.getElementById("list-bills").innerHTML = hB;
+        document.getElementById("list-pay").innerHTML = hP;
+
+        document.getElementById("dash-ca").innerText = "$ " + tCA.toLocaleString();
+        document.getElementById("dash-brut").innerText = "$ " + beneficeImposable.toLocaleString();
+        document.getElementById("dash-brut").style.color = beneficeImposable >= 0 ? "white" : "var(--neon-red)";
+        document.getElementById("dash-tax").innerText = "- $ " + taxe.toLocaleString();
+        document.getElementById("dash-charges").innerText = "- $ " + (tBills + tFix).toLocaleString();
+        
+        let totalSalaries = tSalVar + tFix;
+        document.getElementById("dash-salaries").innerText = "- $ " + totalSalaries.toLocaleString();
+        document.getElementById("total-cashout").innerText = "$ " + totalSalaries.toLocaleString();
+        
+        let elNet = document.getElementById("dash-net");
+        elNet.innerText = "$ " + net.toLocaleString();
+        elNet.style.color = net >= 0 ? "var(--neon-green)" : "var(--neon-red)";
+        elNet.style.textShadow = net >= 0 ? "0 0 30px rgba(0,255,157,0.5)" : "0 0 30px rgba(255, 42, 42, 0.5)";
+
+        renderOrg(dbEmp);
+    }
+
+    function renderOrg(data) {
+        let tree = document.getElementById("org-tree"); tree.innerHTML = "";
+        let levels = [data.filter(e=>e.role==='boss'), data.filter(e=>e.role==='co'), data.filter(e=>e.role==='emp')];
+        levels.forEach(lvl => {
+            if(lvl.length > 0) {
+                let row = document.createElement('div'); row.className = 'org-level';
+                lvl.forEach(e => { row.innerHTML += `<div class="org-card ${e.role}" style="border-color:${ROLES[e.role].neon}; box-shadow: 0 0 15px ${ROLES[e.role].neon}40;"><div class="fw-bold text-white fs-5 mb-1">${e.nom}</div><div class="badge-neon small" style="color:${ROLES[e.role].color}">${ROLES[e.role].label}</div></div>`; });
+                tree.appendChild(row);
+            }
+        });
+    }
+    updateForm();
 </script>
 
 </body>
